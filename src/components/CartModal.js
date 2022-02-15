@@ -1,0 +1,36 @@
+import React from 'react';
+import { Link } from 'react-router-dom';
+import CartModalItem from './CartModalItem';
+
+export default class CartModal extends React.Component {
+  render() {
+    console.log(this.props);
+    return (
+     <div className='cart-modal flex' style={{top: `${this.props.offsetHeight}px`}}>
+      <div className='cart-modal-title flex'>
+      
+      {this.props.cartItems.length > 0 ?
+      <>
+        <h2 className='cart-modal-heading'>My Bag</h2>
+        <p>{`, ${this.props.cartItems.length} item${this.props.cartItems.length > 1 ? 's' : ''}`}</p>
+      </>
+        : <div className='cart-modal-empty'>Your cart is empty</div>}
+        </div>
+
+      <div className='cart-modal-items flex'>
+        {this.props.cartItems.map(item => 
+        <CartModalItem key={item.id}
+                       item={item}
+                       addToCart={this.props.addToCart}
+                       removeFromCart={this.props.removeFromCart}
+        />)}
+      </div>
+      
+      <div className='cart-modal-links flex'> 
+        <Link to={'/cart'}>View bag</Link>
+        <Link to={'/'}>Check out</Link>
+      </div>
+     </div>
+    )
+  }
+}

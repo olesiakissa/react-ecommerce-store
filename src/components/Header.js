@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import logo from '../../src/static/logo.svg';
-
+import CartModal from './CartModal';
 
 export default class Header extends React.Component {
 
@@ -19,11 +19,8 @@ export default class Header extends React.Component {
     }
   }
 
-  showCartModal(e) {
-    //TBA
-  }
-
   render() {
+    console.log(this.props);
     const products = 
     this.props.categories.map(
       category => <li key={category} className='flex'>
@@ -32,8 +29,10 @@ export default class Header extends React.Component {
                                   {category}
                     </Link>
                   </li>);
-
+    const header = document.querySelector('.header')
+    const headerOffsetHeight = header ? header.offsetHeight : 80
     return (
+      <>
       <header className='header flex'>
       <Link to={'/'}>
         <img src={logo} alt='Homepage' className='header-logo'/>
@@ -48,9 +47,9 @@ export default class Header extends React.Component {
                 </option>)}
               </select>
 
-      <button aria-label='Open cart'
+      <button aria-label='Open cart modal'
               className='btn btn-cart'
-              onClick={this.showCartModal}></button>
+              onClick={this.props.toggleCartModal}></button>
 
       <button aria-controls='primary-navigation'
               aria-expanded='false'
@@ -64,6 +63,13 @@ export default class Header extends React.Component {
           </ul>
         </nav>
       </header>
+      {this.props.cartModalIsShown && 
+      <CartModal cartItems={this.props.cartItems}
+                 addToCart={this.props.addToCart}
+                 removeFromCart={this.props.removeFromCart}
+                 offsetHeight={headerOffsetHeight}
+      />}
+      </>
     )
   }
 }

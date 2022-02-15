@@ -16,6 +16,9 @@ export default class App extends React.Component {
     this.updateBtnMenuText = this.updateBtnMenuText.bind(this);
     this.closeMenu = this.closeMenu.bind(this);
     this.handleSwitchCurrency = this.handleSwitchCurrency.bind(this);
+    this.toggleCartModal = this.toggleCartModal.bind(this);
+    this.handleAddToCart = this.handleAddToCart.bind(this);
+    this.handleRemoveFromCart = this.handleRemoveFromCart.bind(this);
   }
 
   state = {
@@ -25,7 +28,9 @@ export default class App extends React.Component {
     currencies: [],
     currentCurrency: '',
     sortBy: '',
-    productsListHeading: ''
+    productsListHeading: '',
+    cartItems: [],
+    cartModalIsShown: false
   }
 
   componentDidMount() {
@@ -43,6 +48,15 @@ export default class App extends React.Component {
     if (this.state.sortBy === '') {
       this.handleFirstLoadFilter();
     } 
+    if (this.state.cartItems.length === 0 && !this.localStorageIsEmpty()) {
+      this.setState({
+        cartItems: JSON.parse(localStorage.getItem("cartItems"))
+      })
+    }
+  }
+
+  localStorageIsEmpty() {
+    return localStorage.getItem("cartItems") === null
   }
 
   handleFirstLoadFilter() {
@@ -82,8 +96,37 @@ export default class App extends React.Component {
     this.setState({currentCurrency: e.target.value})
   }
 
-  handleAddToCart() {
-    //TBA
+  handleAddToCart(product) {
+    const isProductInCart = this.state.cartItems.find(
+                            item => item.id === product.id);
+    if (isProductInCart) {
+      this.setState({
+        cartItems: this.state.cartItems.map(item => item.id === product.id ? 
+          {
+            ...item,
+            amount: item.amount + 1
+          } : item)
+      }, () => {
+        localStorage.setItem("cartItems", JSON.stringify(this.state.cartItems));
+      })
+    } else {
+      this.setState({
+        cartItems: [...this.state.cartItems, {...product, amount: 1}]
+      }, () => {
+        localStorage.setItem("cartItems", JSON.stringify(this.state.cartItems));
+      });
+    }
+  }
+
+  handleRemoveFromCart(product) {
+    // tba
+  }
+
+  toggleCartModal() {
+    this.setState(prevState => ({
+      cartModalIsShown: !prevState.cartModalIsShown
+      })
+    )
   }
 
   render() {
@@ -96,6 +139,11 @@ export default class App extends React.Component {
                 currencies={this.state.currencies}
                 currentCurrency={this.state.currentCurrency}
                 switchCurrency={this.handleSwitchCurrency}
+                cartItems={this.state.cartItems}
+                cartModalIsShown={this.state.cartModalIsShown}
+                toggleCartModal={this.toggleCartModal}
+                addToCart={this.handleAddToCart}
+                removeFromCart={this.handleRemoveFromCart}
                 />}
         {this.state.sortBy && 
         <ProductsList products={this.state.filteredProducts}
