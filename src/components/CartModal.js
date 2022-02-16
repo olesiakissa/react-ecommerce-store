@@ -37,8 +37,8 @@ export default class CartModal extends React.Component {
           </p>
         </div>
         <div className='cart-modal-links flex'> 
-          <Link to={'/cart'}>View bag</Link>
-          <Link to={'/'}>Check out</Link>
+          <Link to={'/cart'} className='cart-modal-link link-view-bag'>View bag</Link>
+          <Link to={'/'} className='cart-modal-link link-checkout'>Check out</Link>
         </div>
       </>
       }
