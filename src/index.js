@@ -2,7 +2,7 @@ import './styles/index.css';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
 import App from './components/App';
 
 import {
@@ -20,9 +20,7 @@ ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter>
       <ApolloProvider client={client}>
-      <Routes> 
-        <Route path='/' element={<App />} />
-      </Routes>
+        <App />
       </ApolloProvider>
     </BrowserRouter>
   </React.StrictMode>,

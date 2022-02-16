@@ -1,9 +1,12 @@
 import React from 'react';
-import Header from './Header';
+import { Routes, Route } from 'react-router-dom';
 
 import {client} from '../index.js'
 import GET_ALL_DATA from '../queries/AllData';
+import Header from './Header';
 import ProductsList from './ProductsList';
+import ProductDescriptionPage from './ProductDescriptionPage';
+import CartPage from './CartPage';
 
 export default class App extends React.Component {
 
@@ -202,13 +205,18 @@ export default class App extends React.Component {
                 addToCart={this.handleAddToCart}
                 removeFromCart={this.handleRemoveFromCart}
                 totalPrice={this.state.totalPrice}
-                />}
-        {this.state.sortBy && 
-        <ProductsList products={this.state.filteredProducts}
-                      currentCurrency={this.state.currentCurrency}
-                      addToCart={this.handleAddToCart}
-                      heading={this.state.productsListHeading}
-        />}
+         />}
+         <Routes>
+            <Route index path='/' element={this.state.sortBy &&
+                            <ProductsList products={this.state.filteredProducts}
+                            currentCurrency={this.state.currentCurrency}
+                            addToCart={this.handleAddToCart}
+                            heading={this.state.productsListHeading}
+              />}>            
+            </Route>
+            <Route path='details/:id' element={<ProductDescriptionPage />} />
+            <Route path='cart' element={<CartPage />}/>
+         </Routes>       
       </>
     )
   }
