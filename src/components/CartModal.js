@@ -4,7 +4,6 @@ import CartModalItem from './CartModalItem';
 
 export default class CartModal extends React.Component {
   render() {
-    console.log(this.props);
     return (
      <div className='cart-modal flex' style={{top: `${this.props.offsetHeight}px`}}>
       <div className='cart-modal-title flex'>
@@ -16,20 +15,25 @@ export default class CartModal extends React.Component {
       </>
         : <div className='cart-modal-empty'>Your cart is empty</div>}
         </div>
-
-      <div className='cart-modal-items flex'>
-        {this.props.cartItems.map(item => 
-        <CartModalItem key={item.id}
-                       item={item}
-                       addToCart={this.props.addToCart}
-                       removeFromCart={this.props.removeFromCart}
-        />)}
-      </div>
       
-      <div className='cart-modal-links flex'> 
-        <Link to={'/cart'}>View bag</Link>
-        <Link to={'/'}>Check out</Link>
-      </div>
+      {this.props.cartItems.length > 0 &&
+      <>
+        <div className='cart-modal-items flex'>
+          {this.props.cartItems.map(item => 
+          <CartModalItem key={item.id}
+                        item={item}
+                        addToCart={this.props.addToCart}
+                        removeFromCart={this.props.removeFromCart}
+                        currentCurrency={this.props.currentCurrency}
+          />)}
+        </div>
+        
+        <div className='cart-modal-links flex'> 
+          <Link to={'/cart'}>View bag</Link>
+          <Link to={'/'}>Check out</Link>
+        </div>
+      </>
+      }
      </div>
     )
   }

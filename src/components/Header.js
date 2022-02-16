@@ -20,7 +20,6 @@ export default class Header extends React.Component {
   }
 
   render() {
-    console.log(this.props);
     const products = 
     this.props.categories.map(
       category => <li key={category} className='flex'>
@@ -67,6 +66,7 @@ export default class Header extends React.Component {
       <CartModal cartItems={this.props.cartItems}
                  addToCart={this.props.addToCart}
                  removeFromCart={this.props.removeFromCart}
+                 currentCurrency={this.props.currentCurrency}
                  offsetHeight={headerOffsetHeight}
       />}
       </>
