@@ -67,6 +67,7 @@ export default class Header extends React.Component {
                  addToCart={this.props.addToCart}
                  removeFromCart={this.props.removeFromCart}
                  currentCurrency={this.props.currentCurrency}
+                 totalPrice={this.props.totalPrice}
                  offsetHeight={headerOffsetHeight}
       />}
       </>

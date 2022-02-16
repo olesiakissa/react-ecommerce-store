@@ -121,7 +121,7 @@ button, select {
   .btn-menu {
     font-size: 1.125rem;
     padding-block-start: 0.5rem;
-    z-index: 2000;
+    z-index: 6000;
   }
 
   .btn-menu[aria-expanded="true"] {
@@ -129,7 +129,7 @@ button, select {
   }
 
   .primary-navigation {
-    z-index: 1000;
+    z-index: 5000;
     position: fixed;
     padding-block-start: 1.5rem;
     background: var(--clr-white);
@@ -257,17 +257,25 @@ button, select {
   position: absolute;
   z-index: 3000;
   left: 0;
-  width: 100vw;
-  height: 50vh;
+  width: 90%;
+  height: auto;
+  max-height: 50vh;
   overflow-y: auto;
+  margin-inline: 1rem;
   background-color: white;
   flex-direction: column;
   align-items: center;
 }
 
+.cart-modal-empty {
+  padding-block: 1.5rem;
+  border-bottom: 1px solid var(--clr-green);
+  width: 100%;
+}
+
 .cart-modal-title {
   align-self: flex-start;
-  margin-inline: 1rem;
+  width: 100%;
 }
 
 .cart-modal-heading {
@@ -282,7 +290,7 @@ button, select {
 .cart-modal-item {
   justify-content: space-between;
   align-items: stretch;
-  margin: 1.25rem 1rem;
+  margin-block: 1.25rem;
 }
 
 .modal-item-heading {
@@ -329,6 +337,21 @@ button, select {
 
 .btn-modal-decrease {
   margin-block-start: 1.875rem;
+}
+
+.total-price {
+  justify-content: space-between;
+  align-items: center;
+  align-self: stretch;
+}
+
+.modal-heading-total {
+  font-family: var(--ff-roboto);
+  font-weight: 500;
+}
+
+.modal-total-price {
+  font-weight: 700;
 }
 
 .cart-modal-links {

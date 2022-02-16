@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { truncateNumberToTwoDecimals } from '../utils/StringUtils';
 import CartModalItem from './CartModalItem';
 
 export default class CartModal extends React.Component {
@@ -21,13 +22,20 @@ export default class CartModal extends React.Component {
         <div className='cart-modal-items flex'>
           {this.props.cartItems.map(item => 
           <CartModalItem key={item.id}
-                        item={item}
-                        addToCart={this.props.addToCart}
-                        removeFromCart={this.props.removeFromCart}
-                        currentCurrency={this.props.currentCurrency}
+                         item={item}
+                         addToCart={this.props.addToCart}
+                         removeFromCart={this.props.removeFromCart}
+                         currentCurrency={this.props.currentCurrency}
           />)}
         </div>
-        
+        <div className='flex total-price'>
+          <h2 className='cart-modal-heading modal-heading-total'>
+            Total
+          </h2>
+          <p className='cart-modal-heading modal-total-price'>
+            {truncateNumberToTwoDecimals(this.props.totalPrice)}
+          </p>
+        </div>
         <div className='cart-modal-links flex'> 
           <Link to={'/cart'}>View bag</Link>
           <Link to={'/'}>Check out</Link>

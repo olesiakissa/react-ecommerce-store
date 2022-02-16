@@ -18,6 +18,7 @@ export default class App extends React.Component {
     this.toggleCartModal = this.toggleCartModal.bind(this);
     this.handleAddToCart = this.handleAddToCart.bind(this);
     this.handleRemoveFromCart = this.handleRemoveFromCart.bind(this);
+    this.updateTotalPrice = this.updateTotalPrice.bind(this);
   }
 
   state = {
@@ -60,7 +61,7 @@ export default class App extends React.Component {
       if (!this.localStorageIsEmpty()) {
         this.setState({
           cartItems: JSON.parse(localStorage.getItem("cartItems"))
-        })
+        }, this.updateTotalPrice)
       }
     } 
   }
@@ -70,7 +71,8 @@ export default class App extends React.Component {
       filteredProducts: this.state.products[0].products,
       currentCurrency: this.state.currencies[0].symbol,
       sortBy: 'all',
-      productsListHeading: 'all'
+      productsListHeading: 'all',
+      totalPrice: 0
     })
   }
 
@@ -98,6 +100,13 @@ export default class App extends React.Component {
     btnMenu.setAttribute("aria-expanded", "false");
   }
 
+  toggleCartModal() {
+    this.setState(prevState => ({
+      cartModalIsShown: !prevState.cartModalIsShown
+      })
+    )
+  }
+
   handleSwitchCurrency(e) {
     this.setState({currentCurrency: e.target.value})
   }
@@ -116,12 +125,18 @@ export default class App extends React.Component {
             ...item,
             amount: item.amount + 1
           } : item)
-      }, this.updateLocalStorage());
+      }, () => {
+        this.updateTotalPrice();
+        this.updateLocalStorage()
+      });
     } else {
       this.setState({
         cartItems: [...this.state.cartItems, {...product, amount: 1}]
-      }, this.updateLocalStorage());
-    }
+      }, () => {
+        this.updateTotalPrice();
+        this.updateLocalStorage();
+        }
+      )}
   }
 
   handleRemoveFromCart(product) {
@@ -133,27 +148,42 @@ export default class App extends React.Component {
             amount: item.amount - 1
           }
           : item)
-      }, this.updateLocalStorage());
+        }, () => {
+          this.updateTotalPrice();
+          this.updateLocalStorage();
+      });
     } else {
       if (this.state.cartItems.length > 1) {
         this.setState({
           cartItems: this.state.cartItems.filter(item => item.id !== product.id)
-        }, this.updateLocalStorage());
+        }, ()=> {
+          this.updateLocalStorage();
+          this.updateTotalPrice();
+        });
       } else {
           this.toggleCartModal();
           localStorage.clear();
           this.setState({
-            cartItems: []
+            cartItems: [],
+            totalPrice: 0
           });
         }
       }  
     }
 
-  toggleCartModal() {
-    this.setState(prevState => ({
-      cartModalIsShown: !prevState.cartModalIsShown
+  updateTotalPrice() {
+    if (this.state.cartItems.length !== 0) {
+      const totalSum = this.state.cartItems.map(
+        item => item.prices.filter(
+          price => price.currency.symbol === this.state.currentCurrency).map(
+            el => el.amount * item.amount
+          )
+        ).flat()
+        .reduce((total, nextPrice) => total + nextPrice, 0);
+      this.setState({
+        totalPrice: totalSum
       })
-    )
+    }
   }
 
   render() {
@@ -171,6 +201,7 @@ export default class App extends React.Component {
                 toggleCartModal={this.toggleCartModal}
                 addToCart={this.handleAddToCart}
                 removeFromCart={this.handleRemoveFromCart}
+                totalPrice={this.state.totalPrice}
                 />}
         {this.state.sortBy && 
         <ProductsList products={this.state.filteredProducts}
