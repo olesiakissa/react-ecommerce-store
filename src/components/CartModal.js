@@ -4,6 +4,41 @@ import { truncateNumberToTwoDecimals } from '../utils/StringUtils';
 import CartModalItem from './CartModalItem';
 
 export default class CartModal extends React.Component {
+
+  /**
+   * Checks if all attributes in all products are selected.
+   * Blocks the user from viewing the bag if one of the attributes is missing
+   * and shows a warning.
+   * @param {*} e Event fired by clicking on one of the cart modal buttons
+   */
+  validateProductAttributes(e) {
+    const isAllAttributesSelected = this.checkAllItemsHaveSelectedAttributes();
+    if (!isAllAttributesSelected) {
+      this.checkAttributesShowWarning(e);
+    } else {
+      this.props.toggleCartModal();
+    }
+  }
+
+  /**
+   * Check whether each cart item has its attributes selected.
+   * 
+   * @returns {boolean} if at least one attribute inside of the item wasn't selected
+   * so the user can't proceed to the cart page.
+   */
+  checkAllItemsHaveSelectedAttributes() {
+    const itemsAttributes = Array.from(document.querySelectorAll('.modal-item-attributes'));
+    const allItemsHaveSelectedAttributes = itemsAttributes.every(
+      cardItem => Array.from(cardItem.children).some(
+        buttonElement => buttonElement.classList.contains('selected')))
+    return allItemsHaveSelectedAttributes;
+  }
+
+  checkAttributesShowWarning(e) {
+    e.preventDefault();
+    document.querySelector('.check-alert').style.display = 'block';
+  }
+
   render() {
     return (
      <div className='cart-modal flex' style={{top: `${this.props.offsetHeight}px`}}>
@@ -26,6 +61,7 @@ export default class CartModal extends React.Component {
                          addToCart={this.props.addToCart}
                          removeFromCart={this.props.removeFromCart}
                          currentCurrency={this.props.currentCurrency}
+                         selectProductAttributes={this.props.selectProductAttributes}
           />)}
         </div>
         <div className='flex total-price'>
@@ -36,9 +72,18 @@ export default class CartModal extends React.Component {
             {truncateNumberToTwoDecimals(this.props.totalPrice)}
           </p>
         </div>
+        <div className='check-alert' role='alert'>Please, select all products attributes</div>
         <div className='cart-modal-links flex'> 
-          <Link to={'/cart'} className='cart-modal-link link-view-bag'>View bag</Link>
-          <Link to={'/'} className='cart-modal-link link-checkout'>Check out</Link>
+          <Link to={'/cart'} 
+                className='cart-modal-link link-view-bag'
+                onClick={ e => this.validateProductAttributes(e) }>
+                View bag
+          </Link>
+          <Link to={'/'} 
+                className='cart-modal-link link-checkout'
+                onClick={ e => this.validateProductAttributes(e) }>
+                Check out
+          </Link>
         </div>
       </>
       }

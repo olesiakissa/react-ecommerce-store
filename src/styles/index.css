@@ -339,6 +339,22 @@ button, select {
   margin-block-start: 1.875rem;
 }
 
+.modal-item-attributes .btn-cart-modal {
+  font-size: 0.875rem;
+  margin-inline-end: 0.5rem;
+  padding: 0.25rem;
+  width: auto;
+  color: var(--clr-gray);
+  background-color: hsl(0, 0%, 93%);
+  border: 1px solid var(--clr-gray);
+}
+
+.modal-item-attributes .btn-cart-modal.selected {
+  color: var(--clr-black);
+  background-color: var(--clr-white);
+  border: 1px solid var(--clr-black);
+}
+
 .total-price {
   justify-content: space-between;
   align-items: center;
@@ -378,4 +394,24 @@ button, select {
   background-color: var(--clr-green);
   border: 1px solid var(--clr-green);
   color: var(--clr-white);
+}
+
+.check-alert {
+  display: none;
+  align-self: flex-start;
+  margin-block: 1rem;
+  color: hsl(0, 64%, 40%);
+}
+
+/* CART PAGE section */
+.cart-container {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.cart-heading {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--clr-black);
+  margin: 2rem 1.5rem;
 }

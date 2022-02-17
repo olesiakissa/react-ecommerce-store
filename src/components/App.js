@@ -21,6 +21,7 @@ export default class App extends React.Component {
     this.toggleCartModal = this.toggleCartModal.bind(this);
     this.handleAddToCart = this.handleAddToCart.bind(this);
     this.handleRemoveFromCart = this.handleRemoveFromCart.bind(this);
+    this.selectProductAttributes = this.selectProductAttributes.bind(this);
     this.updateTotalPrice = this.updateTotalPrice.bind(this);
   }
 
@@ -54,6 +55,16 @@ export default class App extends React.Component {
     this.updateCartItemsOnLoad();
   }
 
+  handleFirstLoadFilter() {
+    this.setState({
+      filteredProducts: this.state.products[0].products,
+      currentCurrency: this.state.currencies[0].symbol,
+      sortBy: 'all',
+      productsListHeading: 'all',
+      totalPrice: 0
+    })
+  }
+
   localStorageIsEmpty() {
     return localStorage.getItem("cartItems") === '[]' ||
            localStorage.getItem("cartItems") === null 
@@ -67,16 +78,6 @@ export default class App extends React.Component {
         }, this.updateTotalPrice)
       }
     } 
-  }
-
-  handleFirstLoadFilter() {
-    this.setState({
-      filteredProducts: this.state.products[0].products,
-      currentCurrency: this.state.currencies[0].symbol,
-      sortBy: 'all',
-      productsListHeading: 'all',
-      totalPrice: 0
-    })
   }
 
   handleFilterProductsByCategory(e) {
@@ -106,8 +107,7 @@ export default class App extends React.Component {
   toggleCartModal() {
     this.setState(prevState => ({
       cartModalIsShown: !prevState.cartModalIsShown
-      })
-    )
+      }));
   }
 
   handleSwitchCurrency(e) {
@@ -174,6 +174,35 @@ export default class App extends React.Component {
       }  
     }
 
+  selectProductAttributes(e, product) {
+    this.updateAttributeButtonFocus(e);
+    this.setState({
+      cartItems: this.state.cartItems.map(item => item.id === product.item.id ? 
+        {
+          ...item,
+          selectedAttributes: {
+            name: item.attributes[0].name,
+            value: e.target.innerHTML
+          }
+        } : item)
+    }, this.updateLocalStorage)
+  }
+
+  /**
+   * Makes a selection on the one attribute in the row of product
+   * attributes and remove focus from the others
+   * @param {*} e Event fired by button that triggers the selection
+   */
+  updateAttributeButtonFocus(e) {
+    const btnArray = e.target.parentNode.children;
+    for (const btn of btnArray) {
+      btn.classList.remove('selected');
+      if (btn.innerHTML === e.target.innerHTML) {
+        e.target.classList.add('selected')
+      }
+    }
+  }
+
   updateTotalPrice() {
     if (this.state.cartItems.length !== 0) {
       const totalSum = this.state.cartItems.map(
@@ -204,8 +233,10 @@ export default class App extends React.Component {
                 toggleCartModal={this.toggleCartModal}
                 addToCart={this.handleAddToCart}
                 removeFromCart={this.handleRemoveFromCart}
+                selectProductAttributes={this.selectProductAttributes}
                 totalPrice={this.state.totalPrice}
          />}
+         <main>
          <Routes>
             <Route index path='/' element={this.state.sortBy &&
                             <ProductsList products={this.state.filteredProducts}
@@ -215,8 +246,11 @@ export default class App extends React.Component {
               />}>            
             </Route>
             <Route path='details/:id' element={<ProductDescriptionPage />} />
-            <Route path='cart' element={<CartPage />}/>
-         </Routes>       
+            <Route path='cart' element={<CartPage cartItems={this.state.cartItems}
+                                                  totalPrice={this.state.totalPrice}
+                                        />}/>
+         </Routes>  
+         </main>     
       </>
     )
   }

@@ -9,7 +9,20 @@ export default class CartModalItem extends React.Component {
         <div className='modal-item-description flex'>
           <h2 className='modal-item-heading'>{this.props.item.name}</h2>
           <p className='modal-item-price'>{`${this.props.currentCurrency}${currentItemPrice}`}</p>
-          <div className='modal-item-attributes'>tba</div>
+          <div className='modal-item-attributes flex'>
+            {this.props.item.attributes.length > 0 && 
+              this.props.item.attributes[0].items.map(
+                attribute => 
+                <button key={attribute.id} 
+                        aria-label={`${this.props.item.attributes[0].name} ${attribute.displayValue}`}
+                        className='btn-cart-modal flex'
+                        onClick={(e)=>this.props.selectProductAttributes(e, this.props)}>
+                        {attribute.displayValue}
+                </button>
+                )
+                
+            }
+          </div>
         </div>
         <div className='cart-modal-buttons flex'>
           <button aria-label='Increase item quantity'

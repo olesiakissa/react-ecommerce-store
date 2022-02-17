@@ -41,7 +41,7 @@ export default class Header extends React.Component {
               name='currency'
               onChange={this.props.switchCurrency}>
               {this.props.currencies.map(currency => 
-                <option value={currency.symbol}>
+                <option key={currency.symbol} value={currency.symbol}>
                   {`${currency.symbol} ${currency.label}`}
                 </option>)}
               </select>
@@ -66,7 +66,9 @@ export default class Header extends React.Component {
       <CartModal cartItems={this.props.cartItems}
                  addToCart={this.props.addToCart}
                  removeFromCart={this.props.removeFromCart}
+                 toggleCartModal={this.props.toggleCartModal}
                  currentCurrency={this.props.currentCurrency}
+                 selectProductAttributes={this.props.selectProductAttributes}
                  totalPrice={this.props.totalPrice}
                  offsetHeight={headerOffsetHeight}
       />}
