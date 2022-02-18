@@ -23,6 +23,9 @@ export default class App extends React.Component {
     this.handleRemoveFromCart = this.handleRemoveFromCart.bind(this);
     this.selectProductAttributes = this.selectProductAttributes.bind(this);
     this.updateTotalPrice = this.updateTotalPrice.bind(this);
+    this.showProductDetails = this.showProductDetails.bind(this);
+    this.updateLocalStorageProductDetails = this.updateLocalStorageProductDetails.bind(this);
+    this.updateProductDetailsOnReload = this.updateProductDetailsOnReload.bind(this);
   }
 
   state = {
@@ -53,6 +56,7 @@ export default class App extends React.Component {
       this.handleFirstLoadFilter();
     } 
     this.updateCartItemsOnLoad();
+    this.updateProductDetailsOnReload();
   }
 
   handleFirstLoadFilter() {
@@ -78,6 +82,21 @@ export default class App extends React.Component {
         }, this.updateTotalPrice)
       }
     } 
+  }
+
+  /**
+   * Fills the product description page from the localStorage
+   * in case the page was reloaded and productDetails was removed
+   * from state on page reload.
+   */
+  updateProductDetailsOnReload() {
+    if (window.location.href.includes('details') &&
+    localStorage.getItem("productDetails") !== null &&
+    !this.state.hasOwnProperty("productDetails")) {
+      this.setState({
+        productDetails: JSON.parse(localStorage.getItem("productDetails"))
+      })
+    }
   }
 
   handleFilterProductsByCategory(e) {
@@ -114,8 +133,18 @@ export default class App extends React.Component {
     this.setState({currentCurrency: e.target.value})
   }
 
-  updateLocalStorage() {
+  updateLocalStorageCartItems() {
     localStorage.setItem("cartItems", JSON.stringify(this.state.cartItems));
+  }
+
+  /**
+   * Saves the details of the product which is requested by
+   * user and is helpful in case the user refreshes the page
+   * and PDP has to be filled with the same data again without 
+   * navigating back to the homepage.
+   */
+  updateLocalStorageProductDetails() {
+    localStorage.setItem("productDetails", JSON.stringify(this.state.productDetails));
   }
 
   handleAddToCart(product) {
@@ -130,14 +159,14 @@ export default class App extends React.Component {
           } : item)
       }, () => {
         this.updateTotalPrice();
-        this.updateLocalStorage()
+        this.updateLocalStorageCartItems()
       });
     } else {
       this.setState({
         cartItems: [...this.state.cartItems, {...product, amount: 1}]
       }, () => {
         this.updateTotalPrice();
-        this.updateLocalStorage();
+        this.updateLocalStorageCartItems();
         }
       )}
   }
@@ -153,14 +182,14 @@ export default class App extends React.Component {
           : item)
         }, () => {
           this.updateTotalPrice();
-          this.updateLocalStorage();
+          this.updateLocalStorageCartItems();
       });
     } else {
       if (this.state.cartItems.length > 1) {
         this.setState({
           cartItems: this.state.cartItems.filter(item => item.id !== product.id)
         }, ()=> {
-          this.updateLocalStorage();
+          this.updateLocalStorageCartItems();
           this.updateTotalPrice();
         });
       } else {
@@ -185,7 +214,7 @@ export default class App extends React.Component {
             value: e.target.innerHTML
           }
         } : item)
-    }, this.updateLocalStorage)
+    }, this.updateLocalStorageCartItems)
   }
 
   /**
@@ -218,6 +247,13 @@ export default class App extends React.Component {
     }
   }
 
+  showProductDetails (id){
+    this.setState({
+      productDetails: this.state.filteredProducts.find(
+        product => product.id === id)
+    }, this.updateLocalStorageProductDetails)
+  }
+
   render() {
     return (
       <>
@@ -242,10 +278,13 @@ export default class App extends React.Component {
                             <ProductsList products={this.state.filteredProducts}
                             currentCurrency={this.state.currentCurrency}
                             addToCart={this.handleAddToCart}
+                            showProductDetails={this.showProductDetails}
                             heading={this.state.productsListHeading}
               />}>            
             </Route>
-            <Route path='details/:id' element={<ProductDescriptionPage />} />
+            <Route path='details/:id' 
+            element={this.state.hasOwnProperty("productDetails") && <ProductDescriptionPage product={this.state.productDetails}/>} />
+
             <Route path='cart' element={<CartPage cartItems={this.state.cartItems}
                                                   totalPrice={this.state.totalPrice}
                                         />}/>

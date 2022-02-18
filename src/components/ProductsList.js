@@ -9,7 +9,9 @@ export default class ProductsList extends React.Component {
         product => <ProductCard key={product.id} 
                                 {...product} 
                                 currentCurrency={this.props.currentCurrency}
-                                addToCart={this.props.addToCart}/>)                           
+                                addToCart={this.props.addToCart}
+                                showProductDetails={this.props.showProductDetails}
+                                />)                           
     return (
       <>
       <h1 className='category-heading'>
