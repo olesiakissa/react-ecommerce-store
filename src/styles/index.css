@@ -111,10 +111,31 @@ button, select {
   font-weight: 500;
 }
 
+.btn-cart-container {
+  position: relative;
+}
+
 .btn-cart {
   background-image: url(/src/static/icon-cart.svg);
   background-repeat: no-repeat;
   background-position: center;
+  position: relative;
+  top: 2px;
+}
+
+.btn-cart-counter {
+  position: absolute;
+  right: 16px;
+  bottom: 33px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 0.875rem;
+  font-weight: 700;
+  background-color: var(--clr-black);
+  color: var(--clr-white);
+  justify-content: center;
+  align-items: center;
 }
 
 @media (max-width: 50em) {

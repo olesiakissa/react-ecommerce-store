@@ -46,9 +46,15 @@ export default class Header extends React.Component {
                 </option>)}
               </select>
 
-      <button aria-label='Open cart modal'
-              className='btn btn-cart'
-              onClick={this.props.toggleCartModal}></button>
+      <div className='btn-cart-container'
+           onClick={this.props.toggleCartModal}>
+        <button aria-label='Open cart modal'
+                className='btn btn-cart'></button>
+        {this.props.cartItems.length > 0 && 
+        <div className='btn-cart-counter flex'>
+          {this.props.cartItems.length}
+        </div>}        
+      </div>
 
       <button aria-controls='primary-navigation'
               aria-expanded='false'
