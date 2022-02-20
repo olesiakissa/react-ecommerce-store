@@ -437,7 +437,8 @@ a:visited {
   color: var(--clr-white) !important;
 }
 
-.check-alert {
+.check-alert,
+.check-attr-alert {
   display: none;
   align-self: flex-start;
   margin-block: 1rem;

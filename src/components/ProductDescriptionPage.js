@@ -6,6 +6,25 @@ export default class ProductDescriptionPage extends React.Component {
     document.querySelector('.pdp-description').innerHTML = this.props.product.description;
   }
 
+  /**
+   * Check whether all product's attributes are selected.
+   * 
+   * @returns {boolean} if at least one attribute inside of the item wasn't selected
+   * (if any exist) the user can't add the item to the cart.
+   */
+  checkAllAttributesAreSelected() {
+    const itemAttributes = Array.from(document.querySelectorAll('.pdp-attributes .pdp-attr-buttons'));
+    const allAttributesAreSelected = itemAttributes.every(
+      attrContainer => Array.from(attrContainer.children).some(
+      button => button.classList.contains('selected')))
+      return allAttributesAreSelected;
+  }
+
+  toggleAlertCheckAttributes(attributesAreChecked) {
+    document.querySelector('.check-attr-alert').style.display = 
+    attributesAreChecked === false ? 'block' : 'none';
+  }
+
   render() {
     const currentItemPrice = this.props.product.prices.find(
       price => price.currency.symbol === this.props.currentCurrency).amount;
@@ -60,7 +79,7 @@ export default class ProductDescriptionPage extends React.Component {
           return (
             <div className='pdp-attributes pdp-sizes-container'>
               <h2 className='attr-name'>{attribute.name}:</h2>
-              <div className='sizes pdp-buttons flex'>
+              <div className='sizes pdp-attr-buttons flex'>
               {attribute.items.map(size => 
               <button className='pdp-button pdp-size'
               onClick={(e) => 
@@ -78,9 +97,20 @@ export default class ProductDescriptionPage extends React.Component {
         <h2 className='pdp-price'>Price:</h2>
         <p>{`${this.props.currentCurrency}${currentItemPrice}`}</p>
       </div>
+      <div className='check-attr-alert' role='alert'>
+        Please, select all product attributes
+      </div>
       <button className='pdp-btn-addToCart'
-              onClick={() => this.props.addToCart(this.props.product)}
-              disabled={!this.props.product.inStock ? true : false}>add to cart</button>
+              onClick={() => {
+                const allAttributesAreSelected = this.checkAllAttributesAreSelected();
+                if (allAttributesAreSelected) {
+                  this.toggleAlertCheckAttributes(allAttributesAreSelected);
+                  this.props.addToCart(this.props.product)
+                } else {
+                  this.toggleAlertCheckAttributes(allAttributesAreSelected);
+                }
+                }}
+              disabled={!this.props.product.inStock ? true : false}>Add to cart</button>
       <div className='pdp-description'>
       </div>   
       </div>
