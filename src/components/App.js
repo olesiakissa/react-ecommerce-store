@@ -203,18 +203,31 @@ export default class App extends React.Component {
       }  
     }
 
-  selectProductAttributes(e, product) {
+  selectProductAttributes(e, attrName, product) {
     this.updateAttributeButtonFocus(e);
-    this.setState({
-      cartItems: this.state.cartItems.map(item => item.id === product.item.id ? 
-        {
-          ...item,
+    const attributeValue = (attrName === 'Size' || attrName === 'Capacity') ?
+                                                        e.target.innerHTML :
+                                                        e.target.id
+    if (!product.selectedAttributes) {
+      this.setState({
+        productDetails: {
+          ...product,
           selectedAttributes: {
-            name: item.attributes[0].name,
-            value: e.target.innerHTML
+            [attrName]: attributeValue
           }
-        } : item)
-    }, this.updateLocalStorageCartItems)
+        }
+      }, this.updateLocalStorageProductDetails)
+    } else {
+      this.setState({
+        productDetails: {
+          ...product,
+          selectedAttributes: {
+            ...product.selectedAttributes,
+            [attrName]: attributeValue
+          }
+        }
+      }, this.updateLocalStorageProductDetails)
+    }
   }
 
   /**
@@ -287,6 +300,7 @@ export default class App extends React.Component {
             <ProductDescriptionPage product={this.state.productDetails}
                                     addToCart={this.handleAddToCart}
                                     currentCurrency={this.state.currentCurrency}
+                                    selectProductAttributes={this.selectProductAttributes}
             />} />
 
             <Route path='cart' element={<CartPage cartItems={this.state.cartItems}

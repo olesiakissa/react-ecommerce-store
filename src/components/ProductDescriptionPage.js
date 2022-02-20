@@ -29,7 +29,12 @@ export default class ProductDescriptionPage extends React.Component {
               attribute.items.map(color => 
               <button aria-label={color.displayValue}
                       style={{backgroundColor: `${color.value}`}}
-                      className='pdp-color-swatch'>
+                      className='pdp-color-swatch'
+                      id={color.id}
+                      onClick={(e) => 
+                      this.props.selectProductAttributes(e, 
+                                                         attribute.name, 
+                                                         this.props.product)}>
               </button>)
             }
           </div>
@@ -40,7 +45,13 @@ export default class ProductDescriptionPage extends React.Component {
               <h2 className='attr-name'>{attribute.name}:</h2>
               <div className='capacity pdp-attr-buttons flex'>
               {attribute.items.map(capacity => 
-              <button className='pdp-button'>{capacity.value}</button>
+              <button className='pdp-button pdp-capacity'
+              onClick={(e) => 
+              this.props.selectProductAttributes(e, 
+                                                 attribute.name,
+                                                 this.props.product)}>
+                  {capacity.value}
+              </button>
               )}
               </div>
             </div>
@@ -51,7 +62,13 @@ export default class ProductDescriptionPage extends React.Component {
               <h2 className='attr-name'>{attribute.name}:</h2>
               <div className='sizes pdp-buttons flex'>
               {attribute.items.map(size => 
-              <button className='pdp-button'>{size.value}</button>)}
+              <button className='pdp-button pdp-size'
+              onClick={(e) => 
+              this.props.selectProductAttributes(e, 
+                                                 attribute.name,
+                                                 this.props.product)}>
+                  {size.value}
+              </button>)}
               </div>
             </div>            
           )
