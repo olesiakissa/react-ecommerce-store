@@ -283,7 +283,11 @@ export default class App extends React.Component {
               />}>            
             </Route>
             <Route path='details/:id' 
-            element={this.state.hasOwnProperty("productDetails") && <ProductDescriptionPage product={this.state.productDetails}/>} />
+            element={this.state.hasOwnProperty("productDetails") && 
+            <ProductDescriptionPage product={this.state.productDetails}
+                                    addToCart={this.handleAddToCart}
+                                    currentCurrency={this.state.currentCurrency}
+            />} />
 
             <Route path='cart' element={<CartPage cartItems={this.state.cartItems}
                                                   totalPrice={this.state.totalPrice}

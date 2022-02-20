@@ -20,7 +20,6 @@ export default class CartModalItem extends React.Component {
                         {attribute.displayValue}
                 </button>
                 )
-                
             }
           </div>
         </div>

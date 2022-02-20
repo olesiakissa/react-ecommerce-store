@@ -2,7 +2,6 @@ import { gql } from '@apollo/client';
 
 const GET_ALL_DATA = {
   query: gql`
-  # Write your query or mutation here
 query {
 	categories {
     name
