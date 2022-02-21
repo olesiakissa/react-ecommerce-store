@@ -1,9 +1,18 @@
 import React from 'react';
+import arrowLeft from '../static/arrow-left.svg';
+import arrowRight from '../static/arrow-right.svg';
 
 export default class ProductDescriptionPage extends React.Component {
 
+  constructor() {
+    super();
+    this.setImageHighlight = this.setImageHighlight.bind(this);
+    this.highlightActiveImage = this.highlightActiveImage.bind(this);
+  }
+
   componentDidMount() {
-    document.querySelector('.pdp-description').innerHTML = this.props.product.description;
+    this.handleProductGallery();
+    this.setProductDescription();
   }
 
   /**
@@ -25,15 +34,80 @@ export default class ProductDescriptionPage extends React.Component {
     attributesAreChecked === false ? 'block' : 'none';
   }
 
+  setProductDescription() {
+    document.querySelector('.pdp-description').innerHTML = this.props.product.description;
+  }
+
+  handleProductGallery() {
+    this.handleArrowsNavigation();
+
+    const imageHighlight = document.querySelector('.pdp-img-highlight');
+    const previews = document.querySelectorAll('.pdp-image');
+    previews.forEach(preview => {
+      preview.addEventListener('click', function(e) {
+        this.setImageHighlight(e, imageHighlight);
+        this.highlightActiveImage(e, previews);    
+      }.bind(this))
+    });
+  }
+
+  /**
+   * @param {*} e image in previews gallery
+   * @param {*} previews thumbnails below image highlight
+   * 
+   * Highlights the picture in the preview gallery
+   */
+  highlightActiveImage(e, previews) {
+    previews.forEach(preview => {
+      preview.classList.remove('active');
+    })
+    e.target.classList.add('active');
+  }
+
+  setImageHighlight(e, imageHighlight) {
+    imageHighlight.src = e.target.src;
+  }
+
+  handleArrowsNavigation() {
+    const arrowLeft = document.getElementById('arrowLeft');
+    const arrowRight = document.getElementById('arrowRight');
+
+    arrowLeft.addEventListener('click', function() {
+      document.querySelector('.gallery-preview').scrollLeft -= 180
+    });
+    arrowRight.addEventListener('click', function() {
+      document.querySelector('.gallery-preview').scrollLeft += 180
+    });
+  }
+
   render() {
     const currentItemPrice = this.props.product.prices.find(
       price => price.currency.symbol === this.props.currentCurrency).amount;
     return (
       <div className={`pdp-product-container flex`}>
-        <img src={this.props.product.gallery[0]} 
-            alt={this.props.product.name}
-            className='pdp-image' />
-      <h1 className="pdp-product-name">{this.props.product.name}</h1>
+        <div className='pdp-img-gallery'>
+          <img src={this.props.product.gallery[0]} 
+               alt={this.props.product.name} 
+               className='pdp-img-highlight'/>
+          <div className="gallery-wrapper flex">
+            <img src={arrowLeft} 
+                alt="Arrow left" 
+                className='gallery-arrow'
+                id='arrowLeft'/>
+              <div className='gallery-preview flex'>
+                  {this.props.product.gallery.map((url, index) =>
+                  <img src={url}
+                      alt={this.props.product.name}
+                      className={`pdp-image ${index === 0 ? 'active' : ''}`}
+                  />)}  
+              </div>
+              <img src={arrowRight} 
+                  alt="Arrow right" 
+                  className='gallery-arrow'
+                  id='arrowRight'/>
+          </div>
+        </div>
+      <h1 className='pdp-product-name'>{this.props.product.name}</h1>
       <div className='check-alert' 
       style={{display: !this.props.product.inStock ? 'block' : 'none'}}>
         Currently unavailable for purchase

@@ -32,6 +32,7 @@ body {
 img {
   width: 100%;
   display: block;
+  cursor:pointer
 }
 
 button {
@@ -42,6 +43,10 @@ button {
 button:hover {
   cursor: pointer;
   opacity: 0.9;
+}
+
+button[disabled] {
+  filter: saturate(20%);
 }
 
 button,
@@ -469,6 +474,71 @@ a:visited {
   width: 90%;
 }
 
+.pdp-img-gallery {
+  display: grid;
+  grid-template-areas: 
+  "main" 
+  "preview";
+  grid-template-rows: minmax(auto, 400px) minmax(100px, auto);
+}
+
+.pdp-img-highlight {
+  grid-area: main;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.gallery-wrapper {
+  max-width: 350px;
+  margin-block-start: 1.5rem;
+  align-items: center;
+  position: relative;
+}
+
+.gallery-preview {
+  grid-area: preview;
+  max-height: 100%;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+.gallery-arrow {
+  display: inline-block;
+  width: 48px;
+  height: 48px;
+  transition: transform 0.3s ease;
+  position: absolute;
+  z-index: 100;
+}
+
+#arrowLeft {
+  left: 0;
+}
+
+#arrowRight {
+  right: 0;
+}
+
+.gallery-arrow:hover {
+  transform: scale(1.2);
+}
+
+.pdp-image {
+  width: 30%;
+  opacity: 0.5;
+  transition: opacity 0.3s ease;
+  margin-inline-end: 1.5rem;
+  object-fit: cover;
+}
+
+.pdp-image.active,
+.pdp-image:hover {
+  opacity: 1;
+}
+
 .pdp-product-name {
   font-size: 1.875rem;
   font-weight: 600;
@@ -563,6 +633,16 @@ a:visited {
 
   .pdp-description h1 {
     font-size: 1.5rem;
+  }
+
+  .pdp-description h1,
+  .pdp-description h2,
+  .pdp-description h3 {
     margin-block-end: 1rem;
+  }
+
+  .pdp-description {
+    line-height: 1.6;
+    max-width: 45ch;
   }
 }
