@@ -26,6 +26,8 @@ export default class App extends React.Component {
     this.showProductDetails = this.showProductDetails.bind(this);
     this.updateLocalStorageProductDetails = this.updateLocalStorageProductDetails.bind(this);
     this.updateProductDetailsOnReload = this.updateProductDetailsOnReload.bind(this);
+    this.updateSelectedAttributesPDP = this.updateSelectedAttributesPDP.bind(this);
+    this.updateSelectedAttributesCartItem = this.updateSelectedAttributesCartItem.bind(this);
   }
 
   state = {
@@ -205,15 +207,30 @@ export default class App extends React.Component {
 
   selectProductAttributes(e, attrName, product) {
     this.updateAttributeButtonFocus(e);
-    const attributeValue = (attrName === 'Size' || attrName === 'Capacity') ?
-                                                        e.target.innerHTML :
-                                                        e.target.id
+
+    const attrValue = (attrName === 'Size' || attrName === 'Capacity') ?
+                      e.target.innerHTML :
+                      e.target.id;
+    /**
+     * If the target button exists in the context of PDP
+     * then we have to update the attributes of the product
+     * that is being added to the cart, otherwise
+     * we have to update the state of product in the cart
+     */
+    if (!e.target.classList.contains('btn-cart-modal')) {
+      this.updateSelectedAttributesPDP(attrName, attrValue, product);
+     } else {
+      this.updateSelectedAttributesCartItem(attrName, attrValue, product);
+    }
+  }
+
+  updateSelectedAttributesPDP(attrName, attrValue, product) {
     if (!product.selectedAttributes) {
       this.setState({
         productDetails: {
           ...product,
           selectedAttributes: {
-            [attrName]: attributeValue
+            [attrName]: attrValue
           }
         }
       }, this.updateLocalStorageProductDetails)
@@ -223,11 +240,24 @@ export default class App extends React.Component {
           ...product,
           selectedAttributes: {
             ...product.selectedAttributes,
-            [attrName]: attributeValue
+            [attrName]: attrValue
           }
         }
       }, this.updateLocalStorageProductDetails)
     }
+  }
+
+  updateSelectedAttributesCartItem(attrName, attrValue, product) {
+      this.setState({
+        cartItems: this.state.cartItems.map(item => item.id === product.id ?
+          {
+            ...product,
+            selectedAttributes: {
+              ...item.selectedAttributes,
+              [attrName]: attrValue
+            }
+          } : item)
+      }, this.updateLocalStorageCartItems)
   }
 
   /**
@@ -260,7 +290,7 @@ export default class App extends React.Component {
     }
   }
 
-  showProductDetails (id){
+  showProductDetails (id) {
     this.setState({
       productDetails: this.state.filteredProducts.find(
         product => product.id === id)
@@ -305,7 +335,9 @@ export default class App extends React.Component {
 
             <Route path='cart' element={<CartPage cartItems={this.state.cartItems}
                                                   totalPrice={this.state.totalPrice}
-                                        />}/>
+                                                  currentCurrency={this.state.currentCurrency}
+                                                  selectProductAttributes={this.selectProductAttributes}
+            />}/>
          </Routes>  
          </main>     
       </>
