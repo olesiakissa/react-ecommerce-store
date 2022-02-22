@@ -32,7 +32,7 @@ body {
 img {
   width: 100%;
   display: block;
-  cursor:pointer
+  cursor: pointer;
 }
 
 button {
@@ -322,6 +322,7 @@ a:visited {
 .cart-modal-title {
   align-self: flex-start;
   width: 100%;
+  padding-inline: 0.5rem;
 }
 
 .cart-modal-heading {
@@ -337,6 +338,7 @@ a:visited {
   justify-content: space-between;
   align-items: stretch;
   margin-block: 1.25rem;
+  padding-inline: 0.5rem;
 }
 
 .modal-item-heading {
@@ -354,6 +356,20 @@ a:visited {
 .modal-item-description {
   flex-direction: column;
   justify-content: space-between;
+}
+
+.cart-modal-item .modal-item-attributes {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.cart-modal-item .pdp-attributes:last-child {
+  margin-block-end: 0;
+}
+
+.cart-modal-item .pdp-color-swatch {
+  width: 1.25rem !important;
+  height: 1.25rem;
 }
 
 .modal-item-price {
@@ -476,9 +492,9 @@ a:visited {
 
 .pdp-img-gallery {
   display: grid;
-  grid-template-areas: 
-  "main" 
-  "preview";
+  grid-template-areas:
+    "main"
+    "preview";
   grid-template-rows: minmax(auto, 400px) minmax(100px, auto);
 }
 
@@ -582,6 +598,7 @@ a:visited {
   width: 2rem;
   height: 2rem;
   border-radius: 50%;
+  border: 1px solid var(--clr-light-gray);
 }
 
 .pdp-button {
