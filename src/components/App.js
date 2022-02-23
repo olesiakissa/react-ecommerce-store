@@ -6,7 +6,7 @@ import GET_ALL_DATA from '../queries/AllData';
 import Header from './Header';
 import ProductsList from './ProductsList';
 import ProductDescriptionPage from './ProductDescriptionPage';
-import CartPage from './CartPage';
+import CartPage from './CartPage/CartPage';
 
 export default class App extends React.Component {
 
@@ -132,7 +132,9 @@ export default class App extends React.Component {
   }
 
   handleSwitchCurrency(e) {
-    this.setState({currentCurrency: e.target.value})
+    this.setState({
+      currentCurrency: e.target.value
+    }, this.updateTotalPrice)
   }
 
   updateLocalStorageCartItems() {
@@ -286,6 +288,8 @@ export default class App extends React.Component {
         .reduce((total, nextPrice) => total + nextPrice, 0);
       this.setState({
         totalPrice: totalSum
+      }, () => {
+        localStorage.setItem("totalPrice", JSON.stringify(this.state.totalPrice))
       })
     }
   }
@@ -335,8 +339,11 @@ export default class App extends React.Component {
 
             <Route path='cart' element={<CartPage cartItems={this.state.cartItems}
                                                   totalPrice={this.state.totalPrice}
+                                                  updateTotalPrice={this.updateTotalPrice}
                                                   currentCurrency={this.state.currentCurrency}
                                                   selectProductAttributes={this.selectProductAttributes}
+                                                  addToCart={this.handleAddToCart}
+                                                  removeFromCart={this.handleRemoveFromCart}
             />}/>
          </Routes>  
          </main>     

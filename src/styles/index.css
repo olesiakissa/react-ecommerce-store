@@ -470,7 +470,7 @@ a:visited {
 
 .cart-container {
   flex-direction: column;
-  align-items: flex-start;
+  align-items: stretch;
 }
 
 .cart-heading {
@@ -480,6 +480,78 @@ a:visited {
   margin: 2rem 1.5rem;
 }
 
+.cart-items-container {
+  flex-direction: column;
+}
+
+.cart-item-card {
+  margin: 1rem;
+  border-top: 1px solid hsl(0, 0%, 90%);
+  color: var(--clr-black);
+  display: grid;
+  grid-template-rows: minmax(auto, 200px) 1fr;
+  grid-template-areas: 
+  "image"
+  "details";
+}
+
+.item-gallery {
+  grid-area: image;
+  align-items: center;
+  scroll-behavior: smooth;
+}
+
+.item-img-highlight {
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.item-details {
+  grid-area: details;
+}
+
+.item-heading {
+  font-size: 1.875rem;
+  font-weight: 400;
+  padding-block-start: 1.125rem;
+  margin-block-end: 1rem;
+}
+
+.item-heading::first-line {
+  font-weight: 600;
+}
+
+.item-price {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-block-end: 1.625rem;
+}
+
+.item-buttons {
+  justify-content: space-between;
+  align-items: center;
+  margin-block-start: 1rem;
+}
+
+.item-buttons p {
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+.cart-item-card .btn-cart-modal {
+  width: 45px;
+  height: 45px;
+  margin: 0;
+}
+
+.cart-items-container .total-price {
+  margin: 1rem;
+}
+
+.cart-items-container .total-price > * {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
 /* PRODUCT DESCRIPTION PAGE section */
 
 .pdp-product-container {
@@ -594,7 +666,8 @@ a:visited {
   align-items: center;
 }
 
-.pdp-color-swatch {
+.pdp-color-swatch,
+.cart-item-card .pdp-color-swatch {
   width: 2rem;
   height: 2rem;
   border-radius: 50%;
