@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { truncateNumberToTwoDecimals } from '../utils/StringUtils';
+import { truncateNumberToTwoDecimals } from '../../utils/StringUtils';
 import CartModalItem from './CartModalItem';
 
 export default class CartModal extends React.Component {

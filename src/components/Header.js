@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import logo from '../../src/static/logo.svg';
-import CartModal from './CartModal';
+import CartModal from './CartModal/CartModal';
 
 export default class Header extends React.Component {
 
@@ -33,7 +33,12 @@ export default class Header extends React.Component {
     return (
       <>
       <header className='header flex'>
-      <Link to={'/'}>
+      <Link to={'/'}
+            onClick={()=>{
+              if (this.props.cartModalIsShown) {
+                this.props.toggleCartModal();
+              }
+            }}>
         <img src={logo} alt='Homepage' className='header-logo'/>
       </Link>
 
@@ -47,7 +52,13 @@ export default class Header extends React.Component {
               </select>
 
       <div className='btn-cart-container'
-           onClick={this.props.toggleCartModal}>
+            onClick={(e)=> {
+              if (window.location.href.includes('cart')) {
+                e.preventDefault();
+              } else {
+                this.props.toggleCartModal();
+              }
+            }}>
         <button aria-label='Open cart modal'
                 className='btn btn-cart'></button>
         {this.props.cartItems.length > 0 && 
@@ -59,7 +70,14 @@ export default class Header extends React.Component {
       <button aria-controls='primary-navigation'
               aria-expanded='false'
               className='btn btn-menu' 
-              onClick={this.toggleMenu}>Menu</button>
+              onClick={(e)=> {
+                          if (this.props.cartModalIsShown) {
+                            this.props.toggleCartModal();
+                          }
+                          this.toggleMenu(e);
+                       }}>
+                Menu
+        </button>
         <nav>
           <ul className='primary-navigation flex' 
               id='primary-navigation'
