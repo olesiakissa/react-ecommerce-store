@@ -9,6 +9,7 @@ export default class CartPageItem extends React.Component {
     this.handleItemGallery = this.handleItemGallery.bind(this);
     this.showNextImage = this.showNextImage.bind(this);
     this.showPrevImage = this.showPrevImage.bind(this);
+    this.setProductSelectedAttributes = this.setProductSelectedAttributes.bind(this);
     this.state = {
       imgIndex: 0
     }
@@ -16,6 +17,59 @@ export default class CartPageItem extends React.Component {
 
   componentDidMount() {
     this.handleItemGallery();
+    if (this.props.item.selectedAttributes) {
+      this.setProductSelectedAttributes();
+    }
+  }
+
+ /**
+   * Highlights the product attributes that were selected 
+   * by user before it was added to the cart.
+   */
+  setProductSelectedAttributes() {
+    const selectedAttributes = this.props.item.selectedAttributes;
+    const attributesContainers = this.getAttributesContainers(selectedAttributes);
+
+    for (let i = 0; i < attributesContainers.length; i++) {
+      this.setActiveAttribute(
+        Array.from(attributesContainers[i].children), 
+        selectedAttributes);
+    }
+  }
+
+  getAttributesContainers(selectedAttributes) {
+    const attributesContainers = [];
+    Object.keys(selectedAttributes).forEach(
+      attrName => {
+        const containers = document.querySelectorAll(`.pdp-attr-buttons#${attrName}`);
+        Array.from(containers).forEach(container => {
+          /**
+           * This check is needed to make sure that we don't select
+           * divs that don't contain our current props item.
+           * If omitted, all divs in cart modal with the specified
+           * selector are selected and the logic of highlighting the 
+           * attributes is breaking.
+           */
+            if (container.closest('.item-selection').innerText.includes(this.props.item.name)) {
+              attributesContainers.push(container);
+            }
+          }
+        )
+      }
+      );
+    return attributesContainers;
+  }
+
+  setActiveAttribute(buttons, selectedAttributes) {
+    buttons.forEach(button => {
+      button.classList.remove('selected');
+      if(selectedAttributes.hasOwnProperty(button.parentNode.id)){
+        if(button.innerText === selectedAttributes[button.parentNode.id] ||
+          button.id === selectedAttributes[button.parentNode.id]) {
+            button.classList.add('selected');
+        }
+      }
+    });
   }
 
   handleItemGallery() {
@@ -109,7 +163,7 @@ export default class CartPageItem extends React.Component {
                     attribute.items.map(color => 
                     <button aria-label={color.displayValue}
                             style={{backgroundColor: `${color.value}`}}
-                            className='pdp-button pdp-color-swatch'
+                            className='pdp-button pdp-color-swatch btn-cart-page'
                             id={color.id}
                             onClick={(e) => 
                             this.props.selectProductAttributes(e, 
@@ -125,7 +179,7 @@ export default class CartPageItem extends React.Component {
                     <div className='capacity pdp-attr-buttons flex'
                         id={attribute.name}>
                     {attribute.items.map(capacity => 
-                    <button className='pdp-button pdp-capacity'
+                    <button className='pdp-button pdp-capacity btn-cart-page'
                             onClick={(e) => 
                             this.props.selectProductAttributes(e, 
                                                               attribute.name,
@@ -142,7 +196,7 @@ export default class CartPageItem extends React.Component {
                     <div className='sizes pdp-attr-buttons flex'
                         id={attribute.name}>
                     {attribute.items.map(size => 
-                    <button className='pdp-button pdp-size'
+                    <button className='pdp-button pdp-size btn-cart-page'
                             onClick={(e) => 
                             this.props.selectProductAttributes(e, 
                                                       attribute.name,

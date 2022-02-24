@@ -219,10 +219,11 @@ export default class App extends React.Component {
      * that is being added to the cart, otherwise
      * we have to update the state of product in the cart
      */
-    if (!e.target.classList.contains('btn-cart-modal')) {
-      this.updateSelectedAttributesPDP(attrName, attrValue, product);
-     } else {
+    if (e.target.classList.contains('btn-cart-modal') ||
+        e.target.classList.contains('btn-cart-page')) {
       this.updateSelectedAttributesCartItem(attrName, attrValue, product);
+     } else {
+      this.updateSelectedAttributesPDP(attrName, attrValue, product);
     }
   }
 

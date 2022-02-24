@@ -499,6 +499,7 @@ a:visited {
   grid-area: image;
   align-items: center;
   scroll-behavior: smooth;
+  margin-block-start: 1rem;
 }
 
 .item-img-highlight {
