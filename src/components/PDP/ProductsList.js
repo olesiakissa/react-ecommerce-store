@@ -1,6 +1,6 @@
 import React from 'react';
 import ProductCard from './ProductCard';
-import { capitalize } from '../utils/StringUtils';
+import { capitalize } from '../../utils/StringUtils';
 
 export default class ProductsList extends React.Component {
 

@@ -4,8 +4,8 @@ import { Routes, Route } from 'react-router-dom';
 import {client} from '../index.js'
 import GET_ALL_DATA from '../queries/AllData';
 import Header from './Header';
-import ProductsList from './ProductsList';
-import ProductDescriptionPage from './ProductDescriptionPage';
+import ProductsList from './PDP/ProductsList';
+import ProductDescriptionPage from './PDP/ProductDescriptionPage';
 import CartPage from './CartPage/CartPage';
 
 export default class App extends React.Component {

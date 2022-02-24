@@ -1,6 +1,6 @@
 import React from 'react';
-import arrowLeft from '../static/arrow-left.svg';
-import arrowRight from '../static/arrow-right.svg';
+import arrowLeft from '../../static/arrow-left.svg';
+import arrowRight from '../../static/arrow-right.svg';
 
 export default class ProductDescriptionPage extends React.Component {
 
@@ -84,7 +84,7 @@ export default class ProductDescriptionPage extends React.Component {
     const currentItemPrice = this.props.product.prices.find(
       price => price.currency.symbol === this.props.currentCurrency).amount;
     return (
-      <div className={`pdp-product-container flex`}>
+      <div className='pdp-product-container flex'>
         <div className='pdp-img-gallery'>
           <img src={this.props.product.gallery[0]} 
                alt={this.props.product.name} 

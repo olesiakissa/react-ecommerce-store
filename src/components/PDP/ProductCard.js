@@ -20,7 +20,8 @@ export default class ProductCard extends React.Component {
           <div className='flex product-cta'>
             <p className='product-price'>{`${this.props.currentCurrency}${filteredPrice}`}</p>
             <button aria-label='Add to cart'
-                    className='product-card-btn-addToCart'>
+                    className='product-card-btn-addToCart'
+                    disabled={!this.props.inStock && true}>
             </button>
           </div>
         </Link>
