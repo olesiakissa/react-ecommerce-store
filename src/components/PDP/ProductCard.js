@@ -21,7 +21,8 @@ export default class ProductCard extends React.Component {
             <p className='product-price'>{`${this.props.currentCurrency}${filteredPrice}`}</p>
             <button aria-label='Add to cart'
                     className='product-card-btn-addToCart'
-                    disabled={!this.props.inStock && true}>
+                    disabled={!this.props.inStock && true}
+                    onClick={(e) => {this.props.addToCart(e, this.props)}}>
             </button>
           </div>
         </Link>

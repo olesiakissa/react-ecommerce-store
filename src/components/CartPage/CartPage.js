@@ -5,10 +5,14 @@ import { truncateNumberToTwoDecimals } from '../../utils/StringUtils';
 export default class CartPage extends React.Component {
 
   componentDidMount() {
-    this.loadTotalPriceOnPageReload();
+    this.loadTotalPrice();
   }
 
-  loadTotalPriceOnPageReload() {
+  componentDidUpdate() {
+    this.loadTotalPrice();
+  }
+  
+  loadTotalPrice() {
       document.querySelector('.total-price-holder').innerText = 
       this.props.totalPrice ? 
       truncateNumberToTwoDecimals(this.props.totalPrice) :
@@ -28,9 +32,7 @@ export default class CartPage extends React.Component {
                           removeFromCart={this.props.removeFromCart}
                           currentCurrency={this.props.currentCurrency}
                           selectProductAttributes={this.props.selectProductAttributes}
-                          />
-          )
-          )}
+                          />))}
             <div className='flex total-price'>
             <h2 className='total-price-heading'>
               Total

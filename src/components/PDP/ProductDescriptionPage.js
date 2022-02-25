@@ -1,6 +1,7 @@
 import React from 'react';
 import arrowLeft from '../../static/arrow-left.svg';
 import arrowRight from '../../static/arrow-right.svg';
+import { replaceSpaceWithDash } from '../../utils/StringUtils';
 
 export default class ProductDescriptionPage extends React.Component {
 
@@ -165,6 +166,40 @@ export default class ProductDescriptionPage extends React.Component {
               </div>
             </div>            
           )
+        } else if (attribute.name === 'With USB 3 ports') {
+          return (
+            <div className='pdp-attributes pdp-ports-container'>
+              <h2 className='attr-name'>{attribute.name}:</h2>
+              <div className='ports pdp-attr-buttons flex'>
+              {attribute.items.map(item => 
+              <button className='pdp-button pdp-port'
+              onClick={(e) => 
+              this.props.selectProductAttributes(
+                e, 
+                replaceSpaceWithDash(attribute.name),
+                this.props.product)}>
+                  {item.value}
+              </button>)}
+              </div>
+            </div>            
+          )
+        } else if (attribute.name === 'Touch ID in keyboard') {
+          return (
+            <div className='pdp-attributes pdp-touchid-container'>
+              <h2 className='attr-name'>{attribute.name}:</h2>
+              <div className='touchid pdp-attr-buttons flex'>
+              {attribute.items.map(item => 
+              <button className='pdp-button pdp-touchid'
+              onClick={(e) => 
+              this.props.selectProductAttributes(
+                e, 
+                replaceSpaceWithDash(attribute.name),
+                this.props.product)}>
+                  {item.value}
+              </button>)}
+              </div>
+            </div>            
+          )
         }
       })}
       <div className='pdp-price-container'>
@@ -175,11 +210,11 @@ export default class ProductDescriptionPage extends React.Component {
         Please, select all product attributes
       </div>
       <button className='pdp-btn-addToCart'
-              onClick={() => {
+              onClick={(e) => {
                 const allAttributesAreSelected = this.checkAllAttributesAreSelected();
                 if (allAttributesAreSelected) {
                   this.toggleAlertCheckAttributes(allAttributesAreSelected);
-                  this.props.addToCart(this.props.product)
+                  this.props.addToCart(e, this.props.product)
                 } else {
                   this.toggleAlertCheckAttributes(allAttributesAreSelected);
                 }

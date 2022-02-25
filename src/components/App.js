@@ -28,6 +28,12 @@ export default class App extends React.Component {
     this.updateProductDetailsOnReload = this.updateProductDetailsOnReload.bind(this);
     this.updateSelectedAttributesPDP = this.updateSelectedAttributesPDP.bind(this);
     this.updateSelectedAttributesCartItem = this.updateSelectedAttributesCartItem.bind(this);
+    this.addToCartWithSelectedAttributes = this.addToCartWithSelectedAttributes.bind(this);
+    this.addToCartWithDefaultAttributes = this.addToCartWithDefaultAttributes.bind(this);
+    this.addToCartWithoutAttributes = this.addToCartWithoutAttributes.bind(this);
+    this.getProductDefaultAttributes = this.getProductDefaultAttributes.bind(this);
+    this.increaseCartItemAmount = this.increaseCartItemAmount.bind(this);
+    this.addNewCartItem = this.addNewCartItem.bind(this);
   }
 
   state = {
@@ -151,15 +157,74 @@ export default class App extends React.Component {
     localStorage.setItem("productDetails", JSON.stringify(this.state.productDetails));
   }
 
-  handleAddToCart(product) {
+  handleAddToCart(e, product) {
+    e.preventDefault();
     const isProductInCart = this.state.cartItems.find(
                             item => item.id === product.id);
+    if (product.hasOwnProperty("attributes")) {
+      if (product.hasOwnProperty("selectedAttributes")) {
+        this.addToCartWithSelectedAttributes(isProductInCart, product);
+      } else {
+        this.addToCartWithDefaultAttributes(isProductInCart, product);
+      }
+    } else {
+      this.addToCartWithoutAttributes(isProductInCart, product);
+    }
+  }
+
+  increaseCartItemAmount(product) {
+    this.setState({
+      cartItems: this.state.cartItems.map(item => item.id === product.id ? 
+        {
+          ...item,
+          amount: item.amount + 1
+        } : item)
+    }, () => {
+      this.updateTotalPrice();
+      this.updateLocalStorageCartItems()
+    }); 
+  }
+
+  addNewCartItem(product) {
+    this.setState({
+      cartItems: [...this.state.cartItems, {...product, amount: 1}]
+    }, () => {
+      this.updateTotalPrice();
+      this.updateLocalStorageCartItems();
+      })
+  }
+
+  addToCartWithoutAttributes(isProductInCart, product) {
+    if (isProductInCart) {
+      this.increaseCartItemAmount(product);
+    } else {
+      this.addNewCartItem(product);
+    }
+  }
+
+  addToCartWithSelectedAttributes(isProductInCart, product) {
+    if (isProductInCart) {
+      this.increaseCartItemAmount(product);
+    } else {
+      this.addNewCartItem(product);
+    }
+  }
+
+  getProductDefaultAttributes(product) {
+    const selectedAttributesArray = product.attributes.map(attribute => ({
+                                      [attribute.name]: attribute.items[0].id
+                                    }))
+    return Object.assign({}, ...selectedAttributesArray);
+  }
+
+  addToCartWithDefaultAttributes(isProductInCart, product) {
     if (isProductInCart) {
       this.setState({
         cartItems: this.state.cartItems.map(item => item.id === product.id ? 
           {
             ...item,
-            amount: item.amount + 1
+            amount: item.amount + 1,
+            selectedAttributes: this.getProductDefaultAttributes(product)
           } : item)
       }, () => {
         this.updateTotalPrice();
@@ -167,12 +232,17 @@ export default class App extends React.Component {
       });
     } else {
       this.setState({
-        cartItems: [...this.state.cartItems, {...product, amount: 1}]
+        cartItems: [...this.state.cartItems, 
+                    {...product, 
+                      amount: 1,
+                      selectedAttributes: this.getProductDefaultAttributes(product)
+                    }]
       }, () => {
         this.updateTotalPrice();
         this.updateLocalStorageCartItems();
         }
-      )}
+      );  
+    }
   }
 
   handleRemoveFromCart(product) {
@@ -210,9 +280,21 @@ export default class App extends React.Component {
   selectProductAttributes(e, attrName, product) {
     this.updateAttributeButtonFocus(e);
 
-    const attrValue = (attrName === 'Size' || attrName === 'Capacity') ?
-                      e.target.innerHTML :
-                      e.target.id;
+    let attrValue = '';
+    switch(attrName) {
+      case 'Size':
+      case 'Capacity':
+      case 'With USB 3 ports':
+      case 'Touch ID in keyboard':
+        attrValue = e.target.innerText;
+        break;
+      case 'Color':
+        attrValue = e.target.id;
+        break;
+      default:
+        attrValue = e.target.innerHTML;
+        break;
+    }
     /**
      * If the target button exists in the context of PDP
      * then we have to update the attributes of the product

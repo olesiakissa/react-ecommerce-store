@@ -358,6 +358,10 @@ a:visited {
   justify-content: space-between;
 }
 
+.modal-item-header-wrapper {
+  margin-block-end: 1rem;
+}
+
 .cart-modal-item .modal-item-attributes {
   flex-direction: column;
   align-items: flex-start;
@@ -689,7 +693,9 @@ a:visited {
 }
 
 .pdp-capacity.selected,
-.pdp-size.selected {
+.pdp-size.selected,
+.pdp-port.selected,
+.pdp-touchid.selected {
   background-color: var(--clr-black);
   color: var(--clr-white);
 }

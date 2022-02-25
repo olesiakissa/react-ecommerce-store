@@ -1,6 +1,7 @@
 import React from 'react';
 import arrowLeft from '../../static/arrow-left.svg';
 import arrowRight from '../../static/arrow-right.svg';
+import { replaceSpaceWithDash } from '../../utils/StringUtils';
 
 export default class CartPageItem extends React.Component {
 
@@ -143,7 +144,7 @@ export default class CartPageItem extends React.Component {
             </button>
             <p>{this.props.item.amount}</p>
             <button aria-label='Increase item quantity'
-                    onClick={() => this.props.addToCart(this.props.item)}
+                    onClick={(e) => this.props.addToCart(e, this.props.item)}
                     className='btn-cart-modal btn-modal-increase flex'>
                     +
             </button>
@@ -166,9 +167,10 @@ export default class CartPageItem extends React.Component {
                             className='pdp-button pdp-color-swatch btn-cart-page'
                             id={color.id}
                             onClick={(e) => 
-                            this.props.selectProductAttributes(e, 
-                                                              attribute.name, 
-                                                              this.props.item)}>
+                            this.props.selectProductAttributes(
+                              e, 
+                              attribute.name, 
+                              this.props.item)}>
                     </button>)
                   }
                 </div>
@@ -181,9 +183,10 @@ export default class CartPageItem extends React.Component {
                     {attribute.items.map(capacity => 
                     <button className='pdp-button pdp-capacity btn-cart-page'
                             onClick={(e) => 
-                            this.props.selectProductAttributes(e, 
-                                                              attribute.name,
-                                                              this.props.item)}>
+                            this.props.selectProductAttributes(
+                              e, 
+                              attribute.name,
+                              this.props.item)}>
                         {capacity.value}
                     </button>
                     )}
@@ -198,13 +201,48 @@ export default class CartPageItem extends React.Component {
                     {attribute.items.map(size => 
                     <button className='pdp-button pdp-size btn-cart-page'
                             onClick={(e) => 
-                            this.props.selectProductAttributes(e, 
-                                                      attribute.name,
-                                                      this.props.item)}>
+                            this.props.selectProductAttributes(
+                              e, 
+                              attribute.name,
+                              this.props.item)}>
                         {size.value}
                     </button>)}
                     </div>
                   </div>            
+                )
+              } else if (attribute.name === 'With USB 3 ports') {
+                  return (
+                    <div className='pdp-attributes pdp-ports-container'>
+                    <div className='ports pdp-attr-buttons flex'
+                        id={replaceSpaceWithDash(attribute.name)}>
+                    {attribute.items.map(item => 
+                    <button className='pdp-button pdp-port btn-cart-page'
+                            onClick={(e) => 
+                            this.props.selectProductAttributes(
+                              e, 
+                              replaceSpaceWithDash(attribute.name),
+                              this.props.item)}>
+                        {item.value}
+                    </button>)}
+                    </div>
+                  </div> 
+                  )
+              } else if (attribute.name === 'Touch ID in keyboard') {
+                return (
+                    <div className='pdp-attributes pdp-touchid-container'>
+                    <div className='touchid pdp-attr-buttons flex'
+                        id={replaceSpaceWithDash(attribute.name)}>
+                    {attribute.items.map(item => 
+                    <button className='pdp-button pdp-touchid btn-cart-page'
+                            onClick={(e) => 
+                            this.props.selectProductAttributes(
+                              e, 
+                              replaceSpaceWithDash(attribute.name),
+                              this.props.item)}>
+                        {item.value}
+                    </button>)}
+                    </div>
+                  </div> 
                 )
               }
             })}  
