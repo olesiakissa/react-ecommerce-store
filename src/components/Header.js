@@ -7,6 +7,11 @@ export default class Header extends React.Component {
 
   componentDidMount() {
     this.highlightFirstTab();
+    this.setTotalItemsQuantity();
+  }
+
+  componentDidUpdate() {
+    this.setTotalItemsQuantity();
   }
 
   highlightFirstTab() {
@@ -34,6 +39,19 @@ export default class Header extends React.Component {
       nav.setAttribute("data-visible", "false");
       e.target.setAttribute("aria-expanded", "false");
       e.target.innerText = 'Menu';
+    }
+  }
+
+  calculateTotalItemsQuantity() {    
+    return this.props.cartItems.map(
+      item => item.amount).reduce(
+        (prevAmount, nextAmount) => prevAmount + nextAmount);
+  }
+
+  setTotalItemsQuantity() {
+    if (this.props.cartItems.length > 0) {
+      document.querySelector('.btn-cart-counter').innerText = 
+      this.calculateTotalItemsQuantity();
     }
   }
 
@@ -89,7 +107,6 @@ export default class Header extends React.Component {
                 className='btn btn-cart'></button>
         {this.props.cartItems.length > 0 && 
         <div className='btn-cart-counter flex'>
-          {this.props.cartItems.length}
         </div>}        
       </div>
 
