@@ -40,8 +40,11 @@ export default class Header extends React.Component {
   render() {
     const products = 
     this.props.categories.map(
-      category => <li key={category} className='flex'>
-                    <Link className='nav-link' to={'/'}
+      category => <li key={category} 
+                      className='flex'>
+                    <Link className='nav-link' 
+                          to={'/'}
+                          aria-label={category} 
                           onClick={(e) => {
                             this.highlightActiveTab(e);
                             this.props.filterProductsByCategory(e);
@@ -63,7 +66,9 @@ export default class Header extends React.Component {
         <img src={logo} alt='Homepage' className='header-logo'/>
       </Link>
 
-      <select className='btn btn-currency'
+      <select aria-label='Switch currency'
+              tabIndex='0'
+              className='btn btn-currency'
               name='currency'
               onChange={this.props.switchCurrency}>
               {this.props.currencies.map(currency => 
@@ -91,6 +96,7 @@ export default class Header extends React.Component {
       <button aria-controls='primary-navigation'
               aria-expanded='false'
               className='btn btn-menu' 
+              id='btn-menu'
               onClick={(e)=> {
                           if (this.props.cartModalIsShown) {
                             this.props.toggleCartModal();
@@ -99,9 +105,11 @@ export default class Header extends React.Component {
                        }}>
                 Menu
         </button>
-        <nav>
+        <nav className='nav'
+             aria-hidden='true'>
           <ul className='primary-navigation flex' 
               id='primary-navigation'
+              aria-labelledby='btn-menu'
               data-visible='false'>
               {products}
           </ul>
