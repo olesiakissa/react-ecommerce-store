@@ -5,6 +5,24 @@ import CartModal from './CartModal/CartModal';
 
 export default class Header extends React.Component {
 
+  componentDidMount() {
+    this.highlightFirstTab();
+  }
+
+  highlightFirstTab() {
+    document.querySelector('.nav-link').classList.add('selected');
+  }
+
+  highlightActiveTab(e) {
+    const navLinks = document.querySelectorAll('.nav-link');
+    navLinks.forEach(link => {
+      link.classList.remove('selected');
+      if (link.innerHTML === e.target.innerHTML) {
+        e.target.classList.add('selected');
+      }
+    });
+  }
+
   toggleMenu(e) {
     const nav = document.querySelector(".primary-navigation");
     const visibility = nav.getAttribute("data-visible");
@@ -24,8 +42,11 @@ export default class Header extends React.Component {
     this.props.categories.map(
       category => <li key={category} className='flex'>
                     <Link className='nav-link' to={'/'}
-                          onClick={this.props.filterProductsByCategory}>
-                                  {category}
+                          onClick={(e) => {
+                            this.highlightActiveTab(e);
+                            this.props.filterProductsByCategory(e);
+                            }}>
+                            {category}
                     </Link>
                   </li>);
     const header = document.querySelector('.header')
