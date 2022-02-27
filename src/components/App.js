@@ -403,6 +403,9 @@ export default class App extends React.Component {
                 totalPrice={this.state.totalPrice}
          />}
          <main>
+         <div className='content-overlay' 
+              style={{display: this.state.cartModalIsShown ? 'block' : 'none'}}>
+        </div>
          <Routes>
             <Route index path='/' element={this.state.sortBy &&
                             <ProductsList products={this.state.filteredProducts}
@@ -428,7 +431,7 @@ export default class App extends React.Component {
                                                   addToCart={this.handleAddToCart}
                                                   removeFromCart={this.handleRemoveFromCart}
             />}/>
-         </Routes>  
+         </Routes> 
          </main>     
       </>
     )
