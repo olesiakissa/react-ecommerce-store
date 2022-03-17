@@ -66,16 +66,19 @@ export default class Header extends React.Component {
                           onClick={(e) => {
                             this.highlightActiveTab(e);
                             this.props.filterProductsByCategory(e);
+                            if (this.props.cartModalIsShown === true) {
+                              this.props.toggleCartModal();
+                            }
                             }}>
                             {category}
                     </Link>
                   </li>);
-    const header = document.querySelector('.header')
-    const headerOffsetHeight = header ? header.offsetHeight : 80
     return (
       <>
-      <header className='header flex'>
-      <Link to={'/'}
+      <header className='header'>
+
+      <Link className='header-logo-link'
+            to={'/'}
             onClick={()=>{
               if (this.props.cartModalIsShown) {
                 this.props.toggleCartModal();
@@ -83,47 +86,46 @@ export default class Header extends React.Component {
             }}>
         <img src={logo} alt='Homepage' className='header-logo'/>
       </Link>
-
-      <select aria-label='Switch currency'
-              tabIndex='0'
-              className='btn btn-currency'
-              name='currency'
-              onChange={this.props.switchCurrency}>
-              {this.props.currencies.map(currency => 
-                <option key={currency.symbol} value={currency.symbol}>
-                  {`${currency.symbol} ${currency.label}`}
-                </option>)}
-              </select>
-
-      <div className='btn-cart-container'
-            onClick={(e)=> {
-              if (window.location.href.includes('cart')) {
-                e.preventDefault();
-              } else {
-                this.props.toggleCartModal();
-              }
-            }}>
-        <button aria-label='Open cart modal'
-                className='btn btn-cart'></button>
-        {this.props.cartItems.length > 0 && 
-        <div className='btn-cart-counter flex'>
-        </div>}        
-      </div>
-
-      <button aria-controls='primary-navigation'
-              aria-expanded='false'
-              className='btn btn-menu' 
-              id='btn-menu'
+      <div className="btn-header-wrapper">
+        <select aria-label='Switch currency'
+                tabIndex='0'
+                className='btn btn-currency'
+                name='currency'
+                onChange={this.props.switchCurrency}>
+                {this.props.currencies.map(currency =>
+                  <option key={currency.symbol} value={currency.symbol}>
+                    {`${currency.symbol} ${currency.label}`}
+                  </option>)}
+                </select>
+        <div className='btn-cart-container'
               onClick={(e)=> {
-                          if (this.props.cartModalIsShown) {
-                            this.props.toggleCartModal();
-                          }
-                          this.toggleMenu(e);
-                       }}>
-                Menu
-        </button>
-        <nav className='nav'
-             aria-hidden='true'>
+                if (window.location.href.includes('cart')) {
+                  e.preventDefault();
+                } else {
+                  this.props.toggleCartModal();
+                }
+              }}>
+          <button aria-label='Open cart modal'
+                  className='btn btn-cart'></button>
+          {this.props.cartItems.length > 0 &&
+          <div className='btn-cart-counter flex'>
+          </div>}
+        </div>
+        <button aria-controls='primary-navigation'
+                aria-expanded='false'
+                className='btn btn-menu' 
+                id='btn-menu'
+                onClick={(e)=> {
+                            if (this.props.cartModalIsShown) {
+                              this.props.toggleCartModal();
+                            }
+                            this.toggleMenu(e);
+                        }}>
+                  Menu
+          </button>
+      </div>
+      <nav className='nav'
+            aria-hidden='true'>
           <ul className='primary-navigation flex' 
               id='primary-navigation'
               aria-labelledby='btn-menu'
@@ -140,7 +142,7 @@ export default class Header extends React.Component {
                  currentCurrency={this.props.currentCurrency}
                  selectProductAttributes={this.props.selectProductAttributes}
                  totalPrice={this.props.totalPrice}
-                 offsetHeight={headerOffsetHeight}
+                 styles={this.props.styles}
       />}
       </>
     )

@@ -85,7 +85,7 @@ export default class ProductDescriptionPage extends React.Component {
     const currentItemPrice = this.props.product.prices.find(
       price => price.currency.symbol === this.props.currentCurrency).amount;
     return (
-      <div className='pdp-product-container flex'>
+      <div className='pdp-product-container'>
         <div className='pdp-img-gallery'>
           <img src={this.props.product.gallery[0]} 
                alt={this.props.product.name} 
@@ -108,120 +108,122 @@ export default class ProductDescriptionPage extends React.Component {
                   id='arrowRight'/>
           </div>
         </div>
-      <h1 className='pdp-product-name'>{this.props.product.name}</h1>
-      <div className='check-alert' 
-      style={{display: !this.props.product.inStock ? 'block' : 'none'}}>
-        Currently unavailable for purchase
-      </div>
-      {this.props.product.attributes.length > 0 && 
-      this.props.product.attributes.map(attribute => {
-        if (attribute.name === 'Color') {
-          return (<div className='pdp-attributes pdp-colors-container'>
-          <h2 className='attr-name'>{attribute.name}:</h2>
-          <div className='color-swatches pdp-attr-buttons flex'>
-            {
-              attribute.items.map(color => 
-              <button aria-label={color.displayValue}
-                      style={{backgroundColor: `${color.value}`}}
-                      className='pdp-color-swatch'
-                      id={color.id}
-                      onClick={(e) => 
-                      this.props.selectProductAttributes(e, 
-                                                         attribute.name, 
-                                                         this.props.product)}>
-              </button>)
-            }
-          </div>
-        </div>)
-        } else if (attribute.name === 'Capacity') {
-          return (
-            <div className='pdp-attributes pdp-capacity-container'>
-              <h2 className='attr-name'>{attribute.name}:</h2>
-              <div className='capacity pdp-attr-buttons flex'>
-              {attribute.items.map(capacity => 
-              <button className='pdp-button pdp-capacity'
-              onClick={(e) => 
-              this.props.selectProductAttributes(e, 
-                                                 attribute.name,
-                                                 this.props.product)}>
-                  {capacity.value}
-              </button>
-              )}
-              </div>
+      <div className="pdp-description-wrapper">
+        <h1 className='pdp-product-name'>{this.props.product.name}</h1>
+        <div className='check-alert'
+        style={{display: !this.props.product.inStock ? 'block' : 'none'}}>
+          Currently unavailable for purchase
+        </div>
+        {this.props.product.attributes.length > 0 &&
+        this.props.product.attributes.map(attribute => {
+          if (attribute.name === 'Color') {
+            return (<div className='pdp-attributes pdp-colors-container'>
+            <h2 className='attr-name'>{attribute.name}:</h2>
+            <div className='color-swatches pdp-attr-buttons flex'>
+              {
+                attribute.items.map(color =>
+                <button aria-label={color.displayValue}
+                        style={{backgroundColor: `${color.value}`}}
+                        className='pdp-color-swatch'
+                        id={color.id}
+                        onClick={(e) =>
+                        this.props.selectProductAttributes(e,
+                                                           attribute.name,
+                                                           this.props.product)}>
+                </button>)
+              }
             </div>
-          )
-        } else if (attribute.name === 'Size') {
-          return (
-            <div className='pdp-attributes pdp-sizes-container'>
-              <h2 className='attr-name'>{attribute.name}:</h2>
-              <div className='sizes pdp-attr-buttons flex'>
-              {attribute.items.map(size => 
-              <button className='pdp-button pdp-size'
-              onClick={(e) => 
-              this.props.selectProductAttributes(e, 
-                                                 attribute.name,
-                                                 this.props.product)}>
-                  {size.value}
-              </button>)}
+          </div>)
+          } else if (attribute.name === 'Capacity') {
+            return (
+              <div className='pdp-attributes pdp-capacity-container'>
+                <h2 className='attr-name'>{attribute.name}:</h2>
+                <div className='capacity pdp-attr-buttons flex'>
+                {attribute.items.map(capacity =>
+                <button className='pdp-button pdp-capacity'
+                onClick={(e) =>
+                this.props.selectProductAttributes(e,
+                                                   attribute.name,
+                                                   this.props.product)}>
+                    {capacity.value}
+                </button>
+                )}
+                </div>
               </div>
-            </div>            
-          )
-        } else if (attribute.name === 'With USB 3 ports') {
-          return (
-            <div className='pdp-attributes pdp-ports-container'>
-              <h2 className='attr-name'>{attribute.name}:</h2>
-              <div className='ports pdp-attr-buttons flex'>
-              {attribute.items.map(item => 
-              <button className='pdp-button pdp-port'
-              onClick={(e) => 
-              this.props.selectProductAttributes(
-                e, 
-                replaceSpaceWithDash(attribute.name),
-                this.props.product)}>
-                  {item.value}
-              </button>)}
+            )
+          } else if (attribute.name === 'Size') {
+            return (
+              <div className='pdp-attributes pdp-sizes-container'>
+                <h2 className='attr-name'>{attribute.name}:</h2>
+                <div className='sizes pdp-attr-buttons flex'>
+                {attribute.items.map(size =>
+                <button className='pdp-button pdp-size'
+                onClick={(e) =>
+                this.props.selectProductAttributes(e,
+                                                   attribute.name,
+                                                   this.props.product)}>
+                    {size.value}
+                </button>)}
+                </div>
               </div>
-            </div>            
-          )
-        } else if (attribute.name === 'Touch ID in keyboard') {
-          return (
-            <div className='pdp-attributes pdp-touchid-container'>
-              <h2 className='attr-name'>{attribute.name}:</h2>
-              <div className='touchid pdp-attr-buttons flex'>
-              {attribute.items.map(item => 
-              <button className='pdp-button pdp-touchid'
-              onClick={(e) => 
-              this.props.selectProductAttributes(
-                e, 
-                replaceSpaceWithDash(attribute.name),
-                this.props.product)}>
-                  {item.value}
-              </button>)}
+            )
+          } else if (attribute.name === 'With USB 3 ports') {
+            return (
+              <div className='pdp-attributes pdp-ports-container'>
+                <h2 className='attr-name'>{attribute.name}:</h2>
+                <div className='ports pdp-attr-buttons flex'>
+                {attribute.items.map(item =>
+                <button className='pdp-button pdp-port'
+                onClick={(e) =>
+                this.props.selectProductAttributes(
+                  e,
+                  replaceSpaceWithDash(attribute.name),
+                  this.props.product)}>
+                    {item.value}
+                </button>)}
+                </div>
               </div>
-            </div>            
-          )
-        }
-      })}
-      <div className='pdp-price-container'>
-        <h2 className='pdp-price'>Price:</h2>
-        <p>{`${this.props.currentCurrency}${currentItemPrice}`}</p>
-      </div>
-      <div className='check-attr-alert' role='alert'>
-        Please, select all product attributes
-      </div>
-      <button className='pdp-btn-addToCart'
-              onClick={(e) => {
-                const allAttributesAreSelected = this.checkAllAttributesAreSelected();
-                if (allAttributesAreSelected) {
-                  this.toggleAlertCheckAttributes(allAttributesAreSelected);
-                  this.props.addToCart(e, this.props.product)
-                } else {
-                  this.toggleAlertCheckAttributes(allAttributesAreSelected);
-                }
-                }}
-              disabled={!this.props.product.inStock ? true : false}>Add to cart</button>
-      <div className='pdp-description'>
-      </div>   
+            )
+          } else if (attribute.name === 'Touch ID in keyboard') {
+            return (
+              <div className='pdp-attributes pdp-touchid-container'>
+                <h2 className='attr-name'>{attribute.name}:</h2>
+                <div className='touchid pdp-attr-buttons flex'>
+                {attribute.items.map(item =>
+                <button className='pdp-button pdp-touchid'
+                onClick={(e) =>
+                this.props.selectProductAttributes(
+                  e,
+                  replaceSpaceWithDash(attribute.name),
+                  this.props.product)}>
+                    {item.value}
+                </button>)}
+                </div>
+              </div>
+            )
+          }
+        })}
+        <div className='pdp-price-container'>
+          <h2 className='pdp-price'>Price:</h2>
+          <p>{`${this.props.currentCurrency}${currentItemPrice}`}</p>
+        </div>
+        <div className='check-attr-alert' role='alert'>
+          Please, select all product attributes
+        </div>
+        <button className='pdp-btn-addToCart'
+                onClick={(e) => {
+                  const allAttributesAreSelected = this.checkAllAttributesAreSelected();
+                  if (allAttributesAreSelected) {
+                    this.toggleAlertCheckAttributes(allAttributesAreSelected);
+                    this.props.addToCart(e, this.props.product)
+                  } else {
+                    this.toggleAlertCheckAttributes(allAttributesAreSelected);
+                  }
+                  }}
+                disabled={!this.props.product.inStock ? true : false}>Add to cart</button>
+        <div className='pdp-description'>
+        </div>
+      </div>  
       </div>
     )
   }

@@ -7,7 +7,9 @@ export default class CartModal extends React.Component {
 
   render() {
     return (
-     <div className='cart-modal flex' style={{top: `${this.props.offsetHeight}px`}}>
+     <div className='cart-modal flex' 
+          style={{right: `${window.innerWidth > 730 ? 
+          this.props.styles.cartModalOffsetRight : 0}`}}>
       <div className='cart-modal-title flex'>
       
       {this.props.cartItems.length > 0 ?

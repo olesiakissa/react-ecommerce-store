@@ -3,14 +3,25 @@ import { Link } from 'react-router-dom';
 
 export default class ProductCard extends React.Component {
   
+  handleMouseHover(e) {
+    e.target.parentElement.classList.add('scaled')
+  }
+
+  handleMouseOut(e) {
+    e.target.parentElement.classList.remove('scaled');
+  }
+
   render() {
     const filteredPrice = this.props.prices.find(
       price => price.currency.symbol === this.props.currentCurrency).amount;
     return (
       <div className={`product-card ${!this.props.inStock && 'out-of-stock'}`}>
-        <Link aria-labelledby={`name${this.props.id}`}
+        <Link className='product-card-link'
+              aria-labelledby={`name${this.props.id}`}
               to={`details/${this.props.id}`}
               onClick={() => this.props.showProductDetails(this.props.id)}
+              onMouseOver={(e) => this.handleMouseHover(e)}
+              onMouseOut={(e) => this.handleMouseOut(e)}
               style={{textDecoration: 'none'}}>
           <img src={this.props.gallery[0]} className='product-thumbnail' alt={this.props.name} />
           <div className='out-of-stock-text' 

@@ -385,6 +385,11 @@ export default class App extends React.Component {
   }
 
   render() {
+    const header = document.querySelector('.header')
+    const styles = {
+      headerOffsetHeight: header ? header.offsetHeight : 100,
+      cartModalOffsetRight: header ? window.getComputedStyle(header).paddingInlineEnd : 50
+    }
     return (
       <>
         {this.state.categories.length > 0 
@@ -401,10 +406,12 @@ export default class App extends React.Component {
                 removeFromCart={this.handleRemoveFromCart}
                 selectProductAttributes={this.selectProductAttributes}
                 totalPrice={this.state.totalPrice}
+                styles={styles}
          />}
-         <main>
+         <main className='main'>
          <div className='content-overlay' 
-              style={{display: this.state.cartModalIsShown ? 'block' : 'none'}}>
+              style={{display: this.state.cartModalIsShown ? 'block' : 'none',
+              top: `${styles.headerOffsetHeight}px`}}>
         </div>
          <Routes>
             <Route index path='/' element={this.state.sortBy &&
