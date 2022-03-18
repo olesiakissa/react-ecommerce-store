@@ -42,7 +42,8 @@ export default class CartPageItem extends React.Component {
     const attributesContainers = [];
     Object.keys(selectedAttributes).forEach(
       attrName => {
-        const containers = document.querySelectorAll(`.pdp-attr-buttons#${attrName}`);
+        const containers = 
+        document.querySelectorAll(`.pdp-attr-buttons#${replaceSpaceWithDash(attrName)}`);
         Array.from(containers).forEach(container => {
           /**
            * This check is needed to make sure that we don't select
