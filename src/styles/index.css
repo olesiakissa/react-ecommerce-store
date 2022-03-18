@@ -495,7 +495,10 @@ a:visited {
 }
 
 .cart-modal-link {
-  padding: 0.813rem 3rem;
+  align-items: center;
+  justify-content: center;
+  width: 140px;
+  padding: 0.813rem 1.5rem;
   text-decoration: none;
   text-transform: uppercase;
   font-weight: 600;
@@ -897,7 +900,7 @@ a:visited {
 
   .product-card-btn-addToCart {
     position: absolute;
-    right: -4px;
+    right: 17px;
     bottom: 63px;
     opacity: 0;
     transition: all 200ms ease-in-out;
@@ -1091,7 +1094,7 @@ a:visited {
     padding-block-start: 0;
   }
 
-  .cart-modal {
-    padding-inline-end: 1.563rem;
+  .modal-item-attributes .pdp-color-swatch {
+    margin-inline-end: 0.25rem;
   }
 }
