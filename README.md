@@ -8,9 +8,12 @@ An online store app written in React with the usage of GraphQL and Apollo Client
   - [Requirements](#requirements)
   - [What I learned](#what-i-learned)
   - [Previews](#previews)
+    - [Desktop demo](#desktop-demo)
+    - [Mobile demo](#mobile-demo)
   - [Local installation](#local-installation)
   - [Useful resources](#useful-resources)
 
+## Overview
 
 ### Requirements
 The user should be able to
@@ -40,7 +43,32 @@ The user should be able to add products to the cart from home page (PLP), produc
 
 
 ### Previews
-tba
+
+#### Desktop demo
+
+https://user-images.githubusercontent.com/15348166/159114238-dda8c92d-7f0e-4cc6-8232-f45f40a8ef2a.mov
+
+Product description pages
+
+<img src="./demo/1_pdp.png" width="1010"> 
+
+<img src="./demo/2_pdp.png" width="1010"> 
+
+Product listing page
+
+<img src="./demo/3_plp.png" width="1010"> 
+
+Cart modal
+
+<img src="./demo/4_cartmodal.png" width="1010"> 
+
+Cart page
+
+<img src="./demo/5_cartpage.png" width="1010"> 
+
+#### Mobile demo
+
+https://user-images.githubusercontent.com/15348166/159114362-e9ea3bc7-0b1e-413a-a805-3dde9cb5fe8a.mov
 
 
 ### Local installation
