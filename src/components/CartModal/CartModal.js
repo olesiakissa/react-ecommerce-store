@@ -4,10 +4,36 @@ import { truncateNumberToTwoDecimals } from '../../utils/StringUtils';
 import CartModalItem from './CartModalItem';
 
 export default class CartModal extends React.Component {
+  constructor(props) {
+    super(props);
+    this.refModal = React.createRef();
+    this.handleOutsideClick = this.handleOutsideClick.bind(this);
+  }
+
+  componentDidMount() {
+    document.addEventListener('mousedown', this.handleOutsideClick);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('mousedown', this.handleOutsideClick);
+  }
+
+  /**
+   * Closes cart modal if the user clicks outside of the window.
+   */
+  handleOutsideClick(e) {
+    if (this.refModal.current.contains(e.target)) {
+      return;
+    } else {
+      this.props.toggleCartModal();
+    }
+  }
 
   render() {
     return (
-     <div className='cart-modal flex' 
+      // TODO Remove inline styles
+     <div ref={this.refModal}
+          className='cart-modal flex' 
           style={{right: `${window.innerWidth > 730 ? 
           this.props.styles.cartModalOffsetRight : 0}`}}>
       <div className='cart-modal-title flex'>
@@ -37,6 +63,7 @@ export default class CartModal extends React.Component {
             Total
           </h2>
           <p className='cart-modal-heading modal-total-price'>
+            {this.props.currentCurrency}
             {truncateNumberToTwoDecimals(this.props.totalPrice)}
           </p>
         </div>
