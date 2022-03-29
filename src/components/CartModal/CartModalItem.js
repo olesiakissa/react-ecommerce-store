@@ -89,8 +89,7 @@ export default class CartModalItem extends React.Component {
                             <button aria-label={color.displayValue}
                                     style={{backgroundColor: `${color.value}`}}
                                     className='btn-cart-modal pdp-color-swatch'
-                                    id={color.id}
-                                    disabled>
+                                    id={color.id}>
                             </button>)
                           }
                     </div>
