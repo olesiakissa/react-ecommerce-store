@@ -41,7 +41,7 @@ export default class CartModal extends React.Component {
       {this.props.cartItems.length > 0 ?
       <>
         <h2 className='cart-modal-heading'>My Bag</h2>
-        <p>{`, ${this.props.cartItems.length} item${this.props.cartItems.length > 1 ? 's' : ''}`}</p>
+        <p>{`, ${this.props.calculateTotalCartItemsQuantity()} item${this.props.cartItems.length > 1 ? 's' : ''}`}</p>
       </>
         : <div className='cart-modal-empty'>Your cart is empty</div>}
         </div>
@@ -50,7 +50,7 @@ export default class CartModal extends React.Component {
       <>
         <div className='cart-modal-items flex'>
           {this.props.cartItems.map(item => 
-          <CartModalItem key={item.id}
+          <CartModalItem key={`${item.id}${Math.random() * 1000}`}
                          item={item}
                          addToCart={this.props.addToCart}
                          removeFromCart={this.props.removeFromCart}

@@ -37,7 +37,7 @@ export default class CartModalItem extends React.Component {
       attrName => {
         const containers = 
         document.querySelectorAll(`.pdp-attr-buttons#${replaceSpaceWithDash(attrName)}`);
-        Array.from(containers).forEach(container => {
+        for (let i = 0; i < containers.length; i++) {
           /**
            * This check is needed to make sure that we don't select
            * divs that don't contain our current props item.
@@ -45,13 +45,12 @@ export default class CartModalItem extends React.Component {
            * selector are selected and the logic of highlighting the 
            * attributes is breaking.
            */
-            if (container.closest('.modal-item-description').innerText.includes(this.props.item.name)) {
-              attributesContainers.push(container);
+          if (Array.from(containers[i].classList).some(
+            className => className.includes(selectedAttributes[attrName]))) {
+            attributesContainers.push(containers[i]);     
             }
           }
-        )
-      }
-      );
+        });
     return attributesContainers;
   }
 
@@ -83,7 +82,7 @@ export default class CartModalItem extends React.Component {
               if (attribute.name === 'Color') {
                 return (
                   <div className='pdp-attributes pdp-colors-container'>
-                    <div className='color-swatches pdp-attr-buttons flex'
+                    <div className={`${this.props.item.id} color-swatches pdp-attr-buttons flex`}
                         id={attribute.name}>
                           {attribute.items.map(color => 
                             <button aria-label={color.displayValue}
@@ -97,7 +96,7 @@ export default class CartModalItem extends React.Component {
                 } else {
                   return (
                     <div className='pdp-attributes pdp-container'>
-                      <div className='pdp-attr-buttons flex'
+                      <div className={`${this.props.item.id} pdp-attr-buttons flex`}
                            id={replaceSpaceWithDash(attribute.name)}>
                               {attribute.items.map(item => 
                                 <button className='btn-cart-modal'
@@ -118,7 +117,7 @@ export default class CartModalItem extends React.Component {
                   className='btn-cart-modal btn-modal-increase flex'>
                   +
           </button>
-          <p>{this.props.item.amount}</p>
+          <p className='cart-modal-item-amount'>{this.props.item.amount}</p>
           <button aria-label='Decrease item quantity'
                   onClick={() => this.props.removeFromCart(this.props.item)}
                   className='btn-cart-modal btn-modal-decrease flex'>

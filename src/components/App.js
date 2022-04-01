@@ -34,6 +34,8 @@ export default class App extends React.Component {
     this.getProductDefaultAttributes = this.getProductDefaultAttributes.bind(this);
     this.increaseCartItemAmount = this.increaseCartItemAmount.bind(this);
     this.addNewCartItem = this.addNewCartItem.bind(this);
+    this.createCustomProductId = this.createCustomProductId.bind(this);
+    this.calculateTotalCartItemsQuantity = this.calculateTotalCartItemsQuantity.bind(this);
   }
 
   state = {
@@ -47,7 +49,7 @@ export default class App extends React.Component {
     cartItems: [],
     cartModalIsShown: false
   }
-
+// TODO Add specific endpoints for each request
   componentDidMount() {
     client.query(GET_ALL_DATA)
       .then(result => {
@@ -157,10 +159,22 @@ export default class App extends React.Component {
     localStorage.setItem("productDetails", JSON.stringify(this.state.productDetails));
   }
 
+  calculateTotalCartItemsQuantity() {    
+    return this.state.cartItems.map(
+      item => item.amount).reduce(
+        (prevAmount, nextAmount) => prevAmount + nextAmount);
+  }
+
+  createCustomProductId(product) {
+    return product.selectedAttributes ? 
+    `${product.id}${Object.entries(product.selectedAttributes).join(',')}` :
+    `${product.attributes?.[0].id},${product.attributes?.[0].items[0].id}`;
+  }
+
   handleAddToCart(e, product) {
     e.preventDefault();
     const isProductInCart = this.state.cartItems.find(
-                            item => item.id === product.id);
+                            item => item.id === product.id);        
     if (product.hasOwnProperty("attributes")) {
       if (product.hasOwnProperty("selectedAttributes")) {
         this.addToCartWithSelectedAttributes(isProductInCart, product);
@@ -187,7 +201,12 @@ export default class App extends React.Component {
 
   addNewCartItem(product) {
     this.setState({
-      cartItems: [...this.state.cartItems, {...product, amount: 1}]
+      cartItems: [...this.state.cartItems, 
+        {
+          ...product, 
+          id: this.createCustomProductId(product),
+          amount: 1
+        }]
     }, () => {
       this.updateTotalPrice();
       this.updateLocalStorageCartItems();
@@ -204,7 +223,11 @@ export default class App extends React.Component {
 
   addToCartWithSelectedAttributes(isProductInCart, product) {
     if (isProductInCart) {
-      this.increaseCartItemAmount(product);
+      if (product.selectedAttributes === isProductInCart.selectedAttributes) {
+        this.increaseCartItemAmount(product);
+      } else {
+        this.addNewCartItem(product);
+      }
     } else {
       this.addNewCartItem(product);
     }
@@ -219,21 +242,17 @@ export default class App extends React.Component {
 
   addToCartWithDefaultAttributes(isProductInCart, product) {
     if (isProductInCart) {
-      this.setState({
-        cartItems: this.state.cartItems.map(item => item.id === product.id ? 
-          {
-            ...item,
-            amount: item.amount + 1,
-            selectedAttributes: this.getProductDefaultAttributes(product)
-          } : item)
-      }, () => {
-        this.updateTotalPrice();
-        this.updateLocalStorageCartItems()
-      });
-    } else {
-      this.setState({
+      if (product.hasOwnProperty('selectedAttributes')) {
+        if (isProductInCart.selectProductAttributes === product.selectProductAttributes) {
+          this.increaseCartItemAmount(product);
+        } else {
+          this.addNewCartItem(product);
+        }
+      } else {
+        this.setState({
         cartItems: [...this.state.cartItems, 
                     {...product, 
+                      id: this.createCustomProductId(product),
                       amount: 1,
                       selectedAttributes: this.getProductDefaultAttributes(product)
                     }]
@@ -242,6 +261,9 @@ export default class App extends React.Component {
         this.updateLocalStorageCartItems();
         }
       );  
+      }
+    } else {
+      this.addNewCartItem(product);  
     }
   }
 
@@ -386,6 +408,7 @@ export default class App extends React.Component {
 
   render() {
     const header = document.querySelector('.header')
+    // TODO Remove inline styles
     const styles = {
       headerOffsetHeight: header ? header.offsetHeight : 100,
       cartModalOffsetRight: header ? window.getComputedStyle(header).paddingInlineEnd : 50
@@ -406,9 +429,11 @@ export default class App extends React.Component {
                 removeFromCart={this.handleRemoveFromCart}
                 selectProductAttributes={this.selectProductAttributes}
                 totalPrice={this.state.totalPrice}
+                calculateTotalCartItemsQuantity={this.calculateTotalCartItemsQuantity}
                 styles={styles}
          />}
          <main className='main'>
+         {/* TODO Remove inline styles */}
          <div className='content-overlay' 
               style={{display: this.state.cartModalIsShown ? 'block' : 'none',
               top: `${styles.headerOffsetHeight}px`}}>

@@ -42,16 +42,10 @@ export default class Header extends React.Component {
     }
   }
 
-  calculateTotalItemsQuantity() {    
-    return this.props.cartItems.map(
-      item => item.amount).reduce(
-        (prevAmount, nextAmount) => prevAmount + nextAmount);
-  }
-
   setTotalItemsQuantity() {
     if (this.props.cartItems.length > 0) {
       document.querySelector('.btn-cart-counter').innerText = 
-      this.calculateTotalItemsQuantity();
+      this.props.calculateTotalCartItemsQuantity();
     }
   }
 
@@ -142,6 +136,7 @@ export default class Header extends React.Component {
                  currentCurrency={this.props.currentCurrency}
                  selectProductAttributes={this.props.selectProductAttributes}
                  totalPrice={this.props.totalPrice}
+                 calculateTotalCartItemsQuantity={this.props.calculateTotalCartItemsQuantity}
                  styles={this.props.styles}
       />}
       </>
