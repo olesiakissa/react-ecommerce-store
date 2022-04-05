@@ -167,8 +167,10 @@ export default class App extends React.Component {
 
   createCustomProductId(product) {
     return product.selectedAttributes ? 
-    `${product.id}${Object.entries(product.selectedAttributes).join(',')}` :
-    `${product.attributes?.[0].id},${product.attributes?.[0].items[0].id}`;
+    `${product.id}${Object.entries(product.selectedAttributes)
+        .join('')}`.replaceAll(/[ ,]/g, '') :
+    `${product.id}${Object.entries(this.getProductDefaultAttributes(product))
+        .join('')}`.replaceAll(/[ ,]/g, '');
   }
 
   handleAddToCart(e, product) {
@@ -200,17 +202,33 @@ export default class App extends React.Component {
   }
 
   addNewCartItem(product) {
-    this.setState({
-      cartItems: [...this.state.cartItems, 
-        {
-          ...product, 
-          id: this.createCustomProductId(product),
-          amount: 1
-        }]
-    }, () => {
-      this.updateTotalPrice();
-      this.updateLocalStorageCartItems();
-      })
+    if (product.hasOwnProperty('attributes') && !product.selectedAttributes) {
+      this.setState({
+        cartItems: [...this.state.cartItems, 
+          {
+            ...product, 
+            id: this.createCustomProductId(product),
+            selectedAttributes: this.getProductDefaultAttributes(product),
+            amount: 1
+          }]
+      }, () => {
+        this.updateTotalPrice();
+        this.updateLocalStorageCartItems();
+        });
+    } else {
+      this.setState({
+        cartItems: [...this.state.cartItems, 
+          {
+            ...product, 
+            id: this.createCustomProductId(product),
+            amount: 1
+          }]
+      }, () => {
+        this.updateTotalPrice();
+        this.updateLocalStorageCartItems();
+        });      
+    }
+
   }
 
   addToCartWithoutAttributes(isProductInCart, product) {

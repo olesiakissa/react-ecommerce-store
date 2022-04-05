@@ -1,4 +1,6 @@
 import React from 'react';
+import { convertArrayToObject, 
+         convertArrayToStringEntry } from '../../utils/DataUtils';
 import { replaceSpaceWithDash } from '../../utils/StringUtils';
 
 export default class CartModalItem extends React.Component {
@@ -6,9 +8,21 @@ export default class CartModalItem extends React.Component {
   constructor() {
     super();
     this.setProductSelectedAttributes = this.setProductSelectedAttributes.bind(this);
+    this.cartModalItemContainsProductQuantity = 
+      this.cartModalItemContainsProductQuantity.bind(this);
+    this.cartModalItemContainsCurrentProductId = 
+     this.cartModalItemContainsCurrentProductId.bind(this);
+    this.cartModalItemClasslistContainsAttributeName = 
+     this.cartModalItemClasslistContainsAttributeName.bind(this);
   }
 
   componentDidMount() {
+    if (this.props.item.selectedAttributes) {
+      this.setProductSelectedAttributes();
+    }
+  }
+
+  componentDidUpdate() {
     if (this.props.item.selectedAttributes) {
       this.setProductSelectedAttributes();
     }
@@ -22,12 +36,10 @@ export default class CartModalItem extends React.Component {
     const selectedAttributes = this.props.item.selectedAttributes;
     const attributesContainers = this.getAttributesContainers(selectedAttributes);
 
-    // TODO Fix attributes selection
-    // (only the first one is selected currently)
-    for (let i = 0; i < attributesContainers.length; i++) {
-      this.setActiveAttribute(
-        Array.from(attributesContainers[i].children), 
-        selectedAttributes);
+    for (let attrIndex = 0; attrIndex < Object.entries(selectedAttributes).length; attrIndex++) {
+        this.setActiveAttribute(
+          Array.from((Array.from(attributesContainers)[attrIndex]).children), 
+          convertArrayToObject(Object.entries(selectedAttributes)[attrIndex]));
     }
   }
 
@@ -36,8 +48,12 @@ export default class CartModalItem extends React.Component {
     Object.keys(selectedAttributes).forEach(
       attrName => {
         const containers = 
-        document.querySelectorAll(`.pdp-attr-buttons#${replaceSpaceWithDash(attrName)}`);
-        for (let i = 0; i < containers.length; i++) {
+          document.querySelectorAll(`.${replaceSpaceWithDash(attrName)}`);
+
+          for (let i = 0; i < containers.length; i++) {
+            const closestModalButtons = 
+            Array.from(containers[i].closest('.cart-modal-item').children).find(
+              item => item.classList.contains('cart-modal-buttons'));
           /**
            * This check is needed to make sure that we don't select
            * divs that don't contain our current props item.
@@ -45,23 +61,47 @@ export default class CartModalItem extends React.Component {
            * selector are selected and the logic of highlighting the 
            * attributes is breaking.
            */
-          if (Array.from(containers[i].classList).some(
-            className => className.includes(selectedAttributes[attrName]))) {
-            attributesContainers.push(containers[i]);     
-            }
+            if (this.cartModalItemContainsCurrentProductId(containers[i], selectedAttributes) &&
+                this.cartModalItemClasslistContainsAttributeName(containers[i], attrName) &&
+                this.cartModalItemContainsProductQuantity(closestModalButtons)) {
+                  attributesContainers.push(containers[i]);
+            } 
           }
+
         });
     return attributesContainers;
   }
 
+  cartModalItemContainsCurrentProductId(modalContainer, selectedAttributes) {
+    const containsValuesFlagsArray = [];
+
+    Object.entries(selectedAttributes).forEach(entry => {
+      containsValuesFlagsArray.push((
+        modalContainer.id.includes(convertArrayToStringEntry(entry)) ? true : false
+      ));
+    });
+
+    return containsValuesFlagsArray.every(flag => flag === true);
+  }
+
+  cartModalItemClasslistContainsAttributeName(modalContainer, attrName) {
+    return modalContainer.classList.contains(replaceSpaceWithDash(attrName));
+  }
+
+  cartModalItemContainsProductQuantity(closestModalButtons) {
+    return Array.from(closestModalButtons.children).find(
+             child => child.classList.contains('cart-modal-item-amount'))
+             .innerText.includes(this.props.item.amount);
+  }
+
   setActiveAttribute(buttons, selectedAttributes) {
     buttons.forEach(button => {
-      button.classList.remove('selected');
-      if(selectedAttributes.hasOwnProperty(button.parentNode.id)){
-        if(button.innerText === selectedAttributes[button.parentNode.id] ||
-          button.id === selectedAttributes[button.parentNode.id]) {
-            button.classList.add('selected');
-        }
+      button.classList.remove('selected'); 
+      
+      const attributeKeyName = Object.keys(selectedAttributes)[0];
+      if(button.innerText === selectedAttributes[attributeKeyName] ||
+        button.id === selectedAttributes[attributeKeyName]) {
+          button.classList.add('selected');
       }
     });
   }
@@ -82,8 +122,9 @@ export default class CartModalItem extends React.Component {
               if (attribute.name === 'Color') {
                 return (
                   <div className='pdp-attributes pdp-colors-container'>
-                    <div className={`${this.props.item.id} color-swatches pdp-attr-buttons flex`}
-                        id={attribute.name}>
+                    <div className=
+                    {`${this.props.item.id} ${replaceSpaceWithDash(attribute.name)} color-swatches pdp-attr-buttons flex`}
+                         id={this.props.item.id}> 
                           {attribute.items.map(color => 
                             <button aria-label={color.displayValue}
                                     style={{backgroundColor: `${color.value}`}}
@@ -96,8 +137,9 @@ export default class CartModalItem extends React.Component {
                 } else {
                   return (
                     <div className='pdp-attributes pdp-container'>
-                      <div className={`${this.props.item.id} pdp-attr-buttons flex`}
-                           id={replaceSpaceWithDash(attribute.name)}>
+                      <div className=
+                      {`${this.props.item.id} ${replaceSpaceWithDash(attribute.name)} pdp-attr-buttons flex`}
+                           id={this.props.item.id}>
                               {attribute.items.map(item => 
                                 <button className='btn-cart-modal'
                                         disabled>
