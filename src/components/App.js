@@ -7,6 +7,7 @@ import Header from './Header';
 import ProductsList from './PDP/ProductsList';
 import ProductDescriptionPage from './PDP/ProductDescriptionPage';
 import CartPage from './CartPage/CartPage';
+import { convertArrayToStringEntry } from '../utils/DataUtils.js';
 
 export default class App extends React.Component {
 
@@ -36,6 +37,7 @@ export default class App extends React.Component {
     this.addNewCartItem = this.addNewCartItem.bind(this);
     this.createCustomProductId = this.createCustomProductId.bind(this);
     this.calculateTotalCartItemsQuantity = this.calculateTotalCartItemsQuantity.bind(this);
+    this.cartProductIdContainsCurrentProductId = this.cartProductIdContainsCurrentProductId.bind(this);
   }
 
   state = {
@@ -173,12 +175,29 @@ export default class App extends React.Component {
         .join('')}`.replaceAll(/[ ,]/g, '');
   }
 
+  cartProductIdContainsCurrentProductId(product, attributes) {
+    const containsValuesFlagsArray = [];
+
+    Object.entries(attributes).forEach(entry => {
+      containsValuesFlagsArray.push((
+        product.id.includes(convertArrayToStringEntry(entry)) ? true : false
+      ));
+    });
+
+    return containsValuesFlagsArray.every(flag => flag === true);
+  }
+
   handleAddToCart(e, product) {
     e.preventDefault();
-    const isProductInCart = this.state.cartItems.find(
-                            item => item.id === product.id);        
+    let isProductInCart = {};
+       
     if (product.hasOwnProperty("attributes")) {
-      if (product.hasOwnProperty("selectedAttributes")) {
+      const productAttributes = 
+      product.selectedAttributes ?? this.getProductDefaultAttributes(product);
+      isProductInCart = this.state.cartItems.find(
+          item => this.cartProductIdContainsCurrentProductId(
+            item, productAttributes) === true);
+      if (product.hasOwnProperty("selectedAttributes")) {      
         this.addToCartWithSelectedAttributes(isProductInCart, product);
       } else {
         this.addToCartWithDefaultAttributes(isProductInCart, product);
@@ -186,6 +205,13 @@ export default class App extends React.Component {
     } else {
       this.addToCartWithoutAttributes(isProductInCart, product);
     }
+  }
+
+  getProductDefaultAttributes(product) {
+    const selectedAttributesArray = product.attributes.map(attribute => ({
+                                      [attribute.name]: attribute.items[0].id
+                                    }))
+    return Object.assign({}, ...selectedAttributesArray);
   }
 
   increaseCartItemAmount(product) {
@@ -241,8 +267,9 @@ export default class App extends React.Component {
 
   addToCartWithSelectedAttributes(isProductInCart, product) {
     if (isProductInCart) {
-      if (product.selectedAttributes === isProductInCart.selectedAttributes) {
-        this.increaseCartItemAmount(product);
+      if (JSON.stringify(isProductInCart.selectedAttributes) === 
+          JSON.stringify(product.selectedAttributes)) {
+        this.increaseCartItemAmount(isProductInCart);
       } else {
         this.addNewCartItem(product);
       }
@@ -251,35 +278,9 @@ export default class App extends React.Component {
     }
   }
 
-  getProductDefaultAttributes(product) {
-    const selectedAttributesArray = product.attributes.map(attribute => ({
-                                      [attribute.name]: attribute.items[0].id
-                                    }))
-    return Object.assign({}, ...selectedAttributesArray);
-  }
-
   addToCartWithDefaultAttributes(isProductInCart, product) {
     if (isProductInCart) {
-      if (product.hasOwnProperty('selectedAttributes')) {
-        if (isProductInCart.selectProductAttributes === product.selectProductAttributes) {
-          this.increaseCartItemAmount(product);
-        } else {
-          this.addNewCartItem(product);
-        }
-      } else {
-        this.setState({
-        cartItems: [...this.state.cartItems, 
-                    {...product, 
-                      id: this.createCustomProductId(product),
-                      amount: 1,
-                      selectedAttributes: this.getProductDefaultAttributes(product)
-                    }]
-      }, () => {
-        this.updateTotalPrice();
-        this.updateLocalStorageCartItems();
-        }
-      );  
-      }
+      this.increaseCartItemAmount(isProductInCart);
     } else {
       this.addNewCartItem(product);  
     }
@@ -448,6 +449,7 @@ export default class App extends React.Component {
                 selectProductAttributes={this.selectProductAttributes}
                 totalPrice={this.state.totalPrice}
                 calculateTotalCartItemsQuantity={this.calculateTotalCartItemsQuantity}
+                cartProductIdContainsCurrentProductId={this.cartProductIdContainsCurrentProductId}
                 styles={styles}
          />}
          <main className='main'>

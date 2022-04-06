@@ -1,6 +1,5 @@
 import React from 'react';
-import { convertArrayToObject, 
-         convertArrayToStringEntry } from '../../utils/DataUtils';
+import { convertArrayToObject } from '../../utils/DataUtils';
 import { replaceSpaceWithDash } from '../../utils/StringUtils';
 
 export default class CartModalItem extends React.Component {
@@ -10,8 +9,6 @@ export default class CartModalItem extends React.Component {
     this.setProductSelectedAttributes = this.setProductSelectedAttributes.bind(this);
     this.cartModalItemContainsProductQuantity = 
       this.cartModalItemContainsProductQuantity.bind(this);
-    this.cartModalItemContainsCurrentProductId = 
-     this.cartModalItemContainsCurrentProductId.bind(this);
     this.cartModalItemClasslistContainsAttributeName = 
      this.cartModalItemClasslistContainsAttributeName.bind(this);
   }
@@ -52,8 +49,10 @@ export default class CartModalItem extends React.Component {
 
           for (let i = 0; i < containers.length; i++) {
             const closestModalButtons = 
+            containers[i].closest('.cart-modal-item') ? 
             Array.from(containers[i].closest('.cart-modal-item').children).find(
-              item => item.classList.contains('cart-modal-buttons'));
+              item => item.classList.contains('cart-modal-buttons')) :
+              null;
           /**
            * This check is needed to make sure that we don't select
            * divs that don't contain our current props item.
@@ -61,7 +60,8 @@ export default class CartModalItem extends React.Component {
            * selector are selected and the logic of highlighting the 
            * attributes is breaking.
            */
-            if (this.cartModalItemContainsCurrentProductId(containers[i], selectedAttributes) &&
+            if (this.props.cartProductIdContainsCurrentProductId(
+                containers[i], selectedAttributes) &&
                 this.cartModalItemClasslistContainsAttributeName(containers[i], attrName) &&
                 this.cartModalItemContainsProductQuantity(closestModalButtons)) {
                   attributesContainers.push(containers[i]);
@@ -72,26 +72,14 @@ export default class CartModalItem extends React.Component {
     return attributesContainers;
   }
 
-  cartModalItemContainsCurrentProductId(modalContainer, selectedAttributes) {
-    const containsValuesFlagsArray = [];
-
-    Object.entries(selectedAttributes).forEach(entry => {
-      containsValuesFlagsArray.push((
-        modalContainer.id.includes(convertArrayToStringEntry(entry)) ? true : false
-      ));
-    });
-
-    return containsValuesFlagsArray.every(flag => flag === true);
-  }
-
   cartModalItemClasslistContainsAttributeName(modalContainer, attrName) {
     return modalContainer.classList.contains(replaceSpaceWithDash(attrName));
   }
 
   cartModalItemContainsProductQuantity(closestModalButtons) {
-    return Array.from(closestModalButtons.children).find(
+    return closestModalButtons? Array.from(closestModalButtons.children).find(
              child => child.classList.contains('cart-modal-item-amount'))
-             .innerText.includes(this.props.item.amount);
+             .innerText.includes(this.props.item.amount) : false;
   }
 
   setActiveAttribute(buttons, selectedAttributes) {
@@ -99,9 +87,9 @@ export default class CartModalItem extends React.Component {
       button.classList.remove('selected'); 
       
       const attributeKeyName = Object.keys(selectedAttributes)[0];
-      if(button.innerText === selectedAttributes[attributeKeyName] ||
-        button.id === selectedAttributes[attributeKeyName]) {
-          button.classList.add('selected');
+      if (button.innerText === selectedAttributes[attributeKeyName] ||
+          button.id === selectedAttributes[attributeKeyName]) {
+            button.classList.add('selected');
       }
     });
   }

@@ -137,6 +137,7 @@ export default class Header extends React.Component {
                  selectProductAttributes={this.props.selectProductAttributes}
                  totalPrice={this.props.totalPrice}
                  calculateTotalCartItemsQuantity={this.props.calculateTotalCartItemsQuantity}
+                 cartProductIdContainsCurrentProductId={this.props.cartProductIdContainsCurrentProductId}
                  styles={this.props.styles}
       />}
       </>

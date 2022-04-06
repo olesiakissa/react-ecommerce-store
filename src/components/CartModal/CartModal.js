@@ -56,6 +56,9 @@ export default class CartModal extends React.Component {
                          removeFromCart={this.props.removeFromCart}
                          currentCurrency={this.props.currentCurrency}
                          selectProductAttributes={this.props.selectProductAttributes}
+                         cartProductIdContainsCurrentProductId={
+                           this.props.cartProductIdContainsCurrentProductId
+                         }
           />)}
         </div>
         <div className='flex total-price'>
