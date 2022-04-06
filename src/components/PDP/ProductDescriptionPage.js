@@ -3,6 +3,7 @@ import arrowLeft from '../../static/arrow-left.svg';
 import arrowRight from '../../static/arrow-right.svg';
 import { replaceSpaceWithDash } from '../../utils/StringUtils';
 
+
 export default class ProductDescriptionPage extends React.Component {
 
   constructor() {
@@ -110,6 +111,7 @@ export default class ProductDescriptionPage extends React.Component {
         </div>
       <div className="pdp-description-wrapper">
         <h1 className='pdp-product-name'>{this.props.product.name}</h1>
+        {/*  TODO Remove inline styles */}
         <div className='check-alert'
         style={{display: !this.props.product.inStock ? 'block' : 'none'}}>
           Currently unavailable for purchase
@@ -117,91 +119,42 @@ export default class ProductDescriptionPage extends React.Component {
         {this.props.product.attributes.length > 0 &&
         this.props.product.attributes.map(attribute => {
           if (attribute.name === 'Color') {
-            return (<div className='pdp-attributes pdp-colors-container'>
-            <h2 className='attr-name'>{attribute.name}:</h2>
-            <div className='color-swatches pdp-attr-buttons flex'>
-              {
-                attribute.items.map(color =>
-                <button aria-label={color.displayValue}
-                        style={{backgroundColor: `${color.value}`}}
-                        className='pdp-color-swatch'
-                        id={color.id}
-                        onClick={(e) =>
-                        this.props.selectProductAttributes(e,
-                                                           attribute.name,
-                                                           this.props.product)}>
-                </button>)
-              }
+            return (
+            <div className='pdp-attributes pdp-colors-container'>
+              <h2 className='attr-name'>{attribute.name}:</h2>
+              <div className='color-swatches pdp-attr-buttons flex'>
+                {
+                  attribute.items.map(color =>
+                  <button aria-label={color.displayValue}
+                          style={{backgroundColor: `${color.value}`}}
+                          className='pdp-color-swatch'
+                          id={color.id}
+                          onClick={(e) =>
+                          this.props.selectProductAttributes(e,
+                                                            attribute.name,
+                                                            this.props.product)}>
+                  </button>)
+                }
             </div>
           </div>)
-          } else if (attribute.name === 'Capacity') {
+          } else {
             return (
-              <div className='pdp-attributes pdp-capacity-container'>
+              <div className='pdp-attributes pdp-container'>
                 <h2 className='attr-name'>{attribute.name}:</h2>
-                <div className='capacity pdp-attr-buttons flex'>
-                {attribute.items.map(capacity =>
+                <div className={`${replaceSpaceWithDash(attribute.name)} pdp-attr-buttons flex`}>
+                {attribute.items.map(item =>
                 <button className='pdp-button pdp-capacity'
                 onClick={(e) =>
                 this.props.selectProductAttributes(e,
                                                    attribute.name,
                                                    this.props.product)}>
-                    {capacity.value}
+                    {item.value}
                 </button>
                 )}
                 </div>
               </div>
             )
-          } else if (attribute.name === 'Size') {
-            return (
-              <div className='pdp-attributes pdp-sizes-container'>
-                <h2 className='attr-name'>{attribute.name}:</h2>
-                <div className='sizes pdp-attr-buttons flex'>
-                {attribute.items.map(size =>
-                <button className='pdp-button pdp-size'
-                onClick={(e) =>
-                this.props.selectProductAttributes(e,
-                                                   attribute.name,
-                                                   this.props.product)}>
-                    {size.value}
-                </button>)}
-                </div>
-              </div>
-            )
-          } else if (attribute.name === 'With USB 3 ports') {
-            return (
-              <div className='pdp-attributes pdp-ports-container'>
-                <h2 className='attr-name'>{attribute.name}:</h2>
-                <div className='ports pdp-attr-buttons flex'>
-                {attribute.items.map(item =>
-                <button className='pdp-button pdp-port'
-                onClick={(e) =>
-                this.props.selectProductAttributes(
-                  e,
-                  replaceSpaceWithDash(attribute.name),
-                  this.props.product)}>
-                    {item.value}
-                </button>)}
-                </div>
-              </div>
-            )
-          } else if (attribute.name === 'Touch ID in keyboard') {
-            return (
-              <div className='pdp-attributes pdp-touchid-container'>
-                <h2 className='attr-name'>{attribute.name}:</h2>
-                <div className='touchid pdp-attr-buttons flex'>
-                {attribute.items.map(item =>
-                <button className='pdp-button pdp-touchid'
-                onClick={(e) =>
-                this.props.selectProductAttributes(
-                  e,
-                  replaceSpaceWithDash(attribute.name),
-                  this.props.product)}>
-                    {item.value}
-                </button>)}
-                </div>
-              </div>
-            )
-          }
+          } 
         })}
         <div className='pdp-price-container'>
           <h2 className='pdp-price'>Price:</h2>
@@ -213,12 +166,12 @@ export default class ProductDescriptionPage extends React.Component {
         <button className='pdp-btn-addToCart'
                 onClick={(e) => {
                   const allAttributesAreSelected = this.checkAllAttributesAreSelected();
-                  if (allAttributesAreSelected) {
-                    this.toggleAlertCheckAttributes(allAttributesAreSelected);
-                    this.props.addToCart(e, this.props.product)
-                  } else {
-                    this.toggleAlertCheckAttributes(allAttributesAreSelected);
-                  }
+                    if (allAttributesAreSelected) {
+                      this.toggleAlertCheckAttributes(allAttributesAreSelected);
+                      this.props.addToCart(e, this.props.product)
+                    } else {
+                      this.toggleAlertCheckAttributes(allAttributesAreSelected);
+                    }
                   }}
                 disabled={!this.props.product.inStock ? true : false}>Add to cart</button>
         <div className='pdp-description'>
