@@ -55,7 +55,6 @@ export default class CartModal extends React.Component {
                          addToCart={this.props.addToCart}
                          removeFromCart={this.props.removeFromCart}
                          currentCurrency={this.props.currentCurrency}
-                         selectProductAttributes={this.props.selectProductAttributes}
                          cartProductIdContainsCurrentProductId={
                            this.props.cartProductIdContainsCurrentProductId
                          }

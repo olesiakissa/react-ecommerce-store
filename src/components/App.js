@@ -28,7 +28,6 @@ export default class App extends React.Component {
     this.updateLocalStorageProductDetails = this.updateLocalStorageProductDetails.bind(this);
     this.updateProductDetailsOnReload = this.updateProductDetailsOnReload.bind(this);
     this.updateSelectedAttributesPDP = this.updateSelectedAttributesPDP.bind(this);
-    this.updateSelectedAttributesCartItem = this.updateSelectedAttributesCartItem.bind(this);
     this.addToCartWithSelectedAttributes = this.addToCartWithSelectedAttributes.bind(this);
     this.addToCartWithDefaultAttributes = this.addToCartWithDefaultAttributes.bind(this);
     this.addToCartWithoutAttributes = this.addToCartWithoutAttributes.bind(this);
@@ -332,18 +331,7 @@ export default class App extends React.Component {
         attrValue = e.target.innerHTML;
         break;
     }
-    /**
-     * If the target button exists in the context of PDP
-     * then we have to update the attributes of the product
-     * that is being added to the cart, otherwise
-     * we have to update the state of product in the cart
-     */
-    if (e.target.classList.contains('btn-cart-modal') ||
-        e.target.classList.contains('btn-cart-page')) {
-      this.updateSelectedAttributesCartItem(attrName, attrValue, product);
-     } else {
       this.updateSelectedAttributesPDP(attrName, attrValue, product);
-    }
   }
 
   updateSelectedAttributesPDP(attrName, attrValue, product) {
@@ -367,19 +355,6 @@ export default class App extends React.Component {
         }
       }, this.updateLocalStorageProductDetails)
     }
-  }
-
-  updateSelectedAttributesCartItem(attrName, attrValue, product) {
-      this.setState({
-        cartItems: this.state.cartItems.map(item => item.id === product.id ?
-          {
-            ...product,
-            selectedAttributes: {
-              ...item.selectedAttributes,
-              [attrName]: attrValue
-            }
-          } : item)
-      }, this.updateLocalStorageCartItems)
   }
 
   /**
@@ -442,7 +417,6 @@ export default class App extends React.Component {
                 toggleCartModal={this.toggleCartModal}
                 addToCart={this.handleAddToCart}
                 removeFromCart={this.handleRemoveFromCart}
-                selectProductAttributes={this.selectProductAttributes}
                 totalPrice={this.state.totalPrice}
                 calculateTotalCartItemsQuantity={this.calculateTotalCartItemsQuantity}
                 cartProductIdContainsCurrentProductId={this.cartProductIdContainsCurrentProductId}
