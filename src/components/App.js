@@ -196,7 +196,8 @@ export default class App extends React.Component {
       product.selectedAttributes ?? this.getProductDefaultAttributes(product);
       isProductInCart = this.state.cartItems.find(
           item => this.cartProductIdContainsCurrentProductId(
-            item, productAttributes) === true);
+            item, productAttributes) === true && 
+            item.name === product.name);
       if (product.hasOwnProperty("selectedAttributes")) {      
         this.addToCartWithSelectedAttributes(isProductInCart, product);
       } else {
@@ -267,15 +268,10 @@ export default class App extends React.Component {
 
   addToCartWithSelectedAttributes(isProductInCart, product) {
     if (isProductInCart) {
-      if (JSON.stringify(isProductInCart.selectedAttributes) === 
-          JSON.stringify(product.selectedAttributes)) {
-        this.increaseCartItemAmount(isProductInCart);
-      } else {
-        this.addNewCartItem(product);
-      }
+      this.increaseCartItemAmount(isProductInCart);
     } else {
       this.addNewCartItem(product);
-    }
+    } 
   }
 
   addToCartWithDefaultAttributes(isProductInCart, product) {
