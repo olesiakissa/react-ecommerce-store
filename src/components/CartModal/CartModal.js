@@ -4,10 +4,39 @@ import { truncateNumberToTwoDecimals } from '../../utils/StringUtils';
 import CartModalItem from './CartModalItem';
 
 export default class CartModal extends React.Component {
+  constructor(props) {
+    super(props);
+    this.refModal = React.createRef();
+    this.handleOutsideClick = this.handleOutsideClick.bind(this);
+  }
+
+  componentDidMount() {
+    document.addEventListener('mousedown', this.handleOutsideClick);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('mousedown', this.handleOutsideClick);
+  }
+
+  /**
+   * Closes cart modal if the user clicks outside of the window.
+   */
+  handleOutsideClick(e) {
+    // Make sure that the reference to the modal still
+    // exists as the changes in the environment are asynchronous
+    if (this.refModal.current && 
+        this.refModal.current.contains(e.target)) {
+      return;
+    } else {
+      this.props.toggleCartModal();
+    }
+  }
 
   render() {
     return (
-     <div className='cart-modal flex' 
+      // TODO Remove inline styles
+     <div ref={this.refModal}
+          className='cart-modal flex' 
           style={{right: `${window.innerWidth > 730 ? 
           this.props.styles.cartModalOffsetRight : 0}`}}>
       <div className='cart-modal-title flex'>
@@ -15,7 +44,7 @@ export default class CartModal extends React.Component {
       {this.props.cartItems.length > 0 ?
       <>
         <h2 className='cart-modal-heading'>My Bag</h2>
-        <p>{`, ${this.props.cartItems.length} item${this.props.cartItems.length > 1 ? 's' : ''}`}</p>
+        <p>{`, ${this.props.calculateTotalCartItemsQuantity()} item${this.props.cartItems.length > 1 ? 's' : ''}`}</p>
       </>
         : <div className='cart-modal-empty'>Your cart is empty</div>}
         </div>
@@ -24,12 +53,14 @@ export default class CartModal extends React.Component {
       <>
         <div className='cart-modal-items flex'>
           {this.props.cartItems.map(item => 
-          <CartModalItem key={item.id}
+          <CartModalItem key={`${item.id}${Math.random() * 1000}`}
                          item={item}
                          addToCart={this.props.addToCart}
                          removeFromCart={this.props.removeFromCart}
                          currentCurrency={this.props.currentCurrency}
-                         selectProductAttributes={this.props.selectProductAttributes}
+                         cartProductIdContainsCurrentProductId={
+                           this.props.cartProductIdContainsCurrentProductId
+                         }
           />)}
         </div>
         <div className='flex total-price'>
@@ -37,6 +68,7 @@ export default class CartModal extends React.Component {
             Total
           </h2>
           <p className='cart-modal-heading modal-total-price'>
+            {this.props.currentCurrency}
             {truncateNumberToTwoDecimals(this.props.totalPrice)}
           </p>
         </div>

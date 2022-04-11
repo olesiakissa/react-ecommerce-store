@@ -764,7 +764,8 @@ a:visited {
 .pdp-capacity.selected,
 .pdp-size.selected,
 .pdp-port.selected,
-.pdp-touchid.selected {
+.pdp-touchid.selected,
+.btn-cart-page.selected {
   background-color: var(--clr-black);
   color: var(--clr-white);
 }

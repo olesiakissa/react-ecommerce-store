@@ -1,4 +1,5 @@
 import React from 'react';
+import { convertArrayToObject } from '../../utils/DataUtils';
 import { replaceSpaceWithDash } from '../../utils/StringUtils';
 
 export default class CartModalItem extends React.Component {
@@ -6,6 +7,10 @@ export default class CartModalItem extends React.Component {
   constructor() {
     super();
     this.setProductSelectedAttributes = this.setProductSelectedAttributes.bind(this);
+    this.cartModalItemContainsProductQuantity = 
+      this.cartModalItemContainsProductQuantity.bind(this);
+    this.cartModalItemClasslistContainsAttributeName = 
+     this.cartModalItemClasslistContainsAttributeName.bind(this);
   }
 
   componentDidMount() {
@@ -13,6 +18,13 @@ export default class CartModalItem extends React.Component {
       this.setProductSelectedAttributes();
     }
   }
+
+  componentDidUpdate() {
+    if (this.props.item.selectedAttributes) {
+      this.setProductSelectedAttributes();
+    }
+  }
+
   /**
    * Highlights the product attributes that were selected 
    * by user before it was added to the cart.
@@ -21,10 +33,10 @@ export default class CartModalItem extends React.Component {
     const selectedAttributes = this.props.item.selectedAttributes;
     const attributesContainers = this.getAttributesContainers(selectedAttributes);
 
-    for (let i = 0; i < attributesContainers.length; i++) {
-      this.setActiveAttribute(
-        Array.from(attributesContainers[i].children), 
-        selectedAttributes);
+    for (let attrIndex = 0; attrIndex < Object.entries(selectedAttributes).length; attrIndex++) {
+        this.setActiveAttribute(
+          Array.from((Array.from(attributesContainers)[attrIndex]).children), 
+          convertArrayToObject(Object.entries(selectedAttributes)[attrIndex]));
     }
   }
 
@@ -33,8 +45,14 @@ export default class CartModalItem extends React.Component {
     Object.keys(selectedAttributes).forEach(
       attrName => {
         const containers = 
-        document.querySelectorAll(`.pdp-attr-buttons#${replaceSpaceWithDash(attrName)}`);
-        Array.from(containers).forEach(container => {
+          document.querySelectorAll(`.${replaceSpaceWithDash(attrName)}`);
+
+          for (let i = 0; i < containers.length; i++) {
+            const closestModalButtons = 
+            containers[i].closest('.cart-modal-item') ? 
+            Array.from(containers[i].closest('.cart-modal-item').children).find(
+              item => item.classList.contains('cart-modal-buttons')) :
+              null;
           /**
            * This check is needed to make sure that we don't select
            * divs that don't contain our current props item.
@@ -42,29 +60,40 @@ export default class CartModalItem extends React.Component {
            * selector are selected and the logic of highlighting the 
            * attributes is breaking.
            */
-            if (container.closest('.modal-item-description').innerText.includes(this.props.item.name)) {
-              attributesContainers.push(container);
-            }
+            if (this.props.cartProductIdContainsCurrentProductId(
+                containers[i], selectedAttributes) &&
+                this.cartModalItemClasslistContainsAttributeName(containers[i], attrName) &&
+                this.cartModalItemContainsProductQuantity(closestModalButtons)) {
+                  attributesContainers.push(containers[i]);
+            } 
           }
-        )
-      }
-      );
+        });
     return attributesContainers;
+  }
+
+  cartModalItemClasslistContainsAttributeName(modalContainer, attrName) {
+    return modalContainer.classList.contains(replaceSpaceWithDash(attrName));
+  }
+
+  cartModalItemContainsProductQuantity(closestModalButtons) {
+    return closestModalButtons ? Array.from(closestModalButtons.children).find(
+             child => child.classList.contains('cart-modal-item-amount'))
+             .innerText.includes(this.props.item.amount) : false;
   }
 
   setActiveAttribute(buttons, selectedAttributes) {
     buttons.forEach(button => {
-      button.classList.remove('selected');
-      if(selectedAttributes.hasOwnProperty(button.parentNode.id)){
-        if(button.innerText === selectedAttributes[button.parentNode.id] ||
-          button.id === selectedAttributes[button.parentNode.id]) {
+      button.classList.remove('selected'); 
+      
+      const attributeKeyName = Object.keys(selectedAttributes)[0];
+      if (button.innerText === selectedAttributes[attributeKeyName] ||
+          button.id === selectedAttributes[attributeKeyName]) {
             button.classList.add('selected');
-        }
       }
     });
   }
 
-  render(){
+  render() {
     const currentItemPrice = this.props.item.prices.find(
       price => price.currency.symbol === this.props.currentCurrency).amount;
     return (
@@ -77,105 +106,47 @@ export default class CartModalItem extends React.Component {
           <div className='modal-item-attributes flex'>
             {this.props.item.attributes.length > 0 && 
               this.props.item.attributes.map(attribute => {
-        if (attribute.name === 'Color') {
-          return (<div className='pdp-attributes pdp-colors-container'>
-          <div className='color-swatches pdp-attr-buttons flex'
-               id={attribute.name}>
-            {
-              attribute.items.map(color => 
-              <button aria-label={color.displayValue}
-                      style={{backgroundColor: `${color.value}`}}
-                      className='btn-cart-modal pdp-color-swatch'
-                      id={color.id}
-                      onClick={(e) => 
-                      this.props.selectProductAttributes(
-                        e, 
-                        attribute.name, 
-                        this.props.item)}>
-              </button>)
-            }
-          </div>
-        </div>)
-        } else if (attribute.name === 'Capacity') {
-          return (
-            <div className='pdp-attributes pdp-capacity-container'>
-              <div className='capacity pdp-attr-buttons flex'
-                   id={attribute.name}>
-              {attribute.items.map(capacity => 
-              <button className='btn-cart-modal pdp-capacity'
-                      onClick={(e) => 
-                      this.props.selectProductAttributes(
-                        e, 
-                        attribute.name,
-                        this.props.item)}>
-                  {capacity.value}
-              </button>
-              )}
+              if (attribute.name === 'Color') {
+                return (
+                  <div className='pdp-attributes pdp-colors-container'>
+                    <div className=
+                    {`${this.props.item.id} ${replaceSpaceWithDash(attribute.name)} color-swatches pdp-attr-buttons flex`}
+                         id={this.props.item.id}> 
+                          {attribute.items.map(color => 
+                            <button aria-label={color.displayValue}
+                                    style={{backgroundColor: `${color.value}`}}
+                                    className='btn-cart-modal pdp-color-swatch'
+                                    id={color.id}>
+                            </button>)
+                          }
+                    </div>
+                  </div>)
+                } else {
+                  return (
+                    <div className='pdp-attributes pdp-container'>
+                      <div className=
+                      {`${this.props.item.id} ${replaceSpaceWithDash(attribute.name)} pdp-attr-buttons flex`}
+                           id={this.props.item.id}>
+                              {attribute.items.map(item => 
+                                <button className='btn-cart-modal'
+                                        disabled>
+                                    {item.value}
+                                </button>
+                              )}
+                      </div>
+                    </div>
+                  )
+                }
+              })}
               </div>
             </div>
-          )
-        } else if (attribute.name === 'Size') {
-          return (
-            <div className='pdp-attributes pdp-sizes-container'>
-              <div className='sizes pdp-attr-buttons flex'
-                   id={attribute.name}>
-              {attribute.items.map(size => 
-              <button className='btn-cart-modal pdp-size'
-                      onClick={(e) => 
-                      this.props.selectProductAttributes(
-                        e, 
-                        attribute.name,
-                        this.props.item)}>
-                  {size.value}
-              </button>)}
-              </div>
-            </div>            
-          )
-        } else if (attribute.name === 'With USB 3 ports') {
-          return (
-            <div className='pdp-attributes pdp-ports-container'>
-              <div className='ports pdp-attr-buttons flex'
-                   id={replaceSpaceWithDash(attribute.name)}>
-              {attribute.items.map(item => 
-              <button className='btn-cart-modal pdp-port'
-                      onClick={(e) => 
-                      this.props.selectProductAttributes(
-                        e, 
-                        replaceSpaceWithDash(attribute.name),
-                        this.props.item)}>
-                  {item.value}
-              </button>)}
-              </div>
-            </div>            
-          )
-        } else if (attribute.name === 'Touch ID in keyboard') {
-          return (
-            <div className='pdp-attributes pdp-touchid-container'>
-              <div className='touchid pdp-attr-buttons flex'
-                   id={replaceSpaceWithDash(attribute.name)}>
-              {attribute.items.map(item => 
-              <button className='btn-cart-modal pdp-touchid'
-                      onClick={(e) => 
-                      this.props.selectProductAttributes(
-                        e, 
-                        replaceSpaceWithDash(attribute.name),
-                        this.props.item)}>
-                  {item.value}
-              </button>)}
-              </div>
-            </div>            
-          )
-        }
-      })}  
-          </div>
-        </div>
         <div className='cart-modal-buttons flex'>
           <button aria-label='Increase item quantity'
                   onClick={(e) => this.props.addToCart(e, this.props.item)}
                   className='btn-cart-modal btn-modal-increase flex'>
                   +
           </button>
-          <p>{this.props.item.amount}</p>
+          <p className='cart-modal-item-amount'>{this.props.item.amount}</p>
           <button aria-label='Decrease item quantity'
                   onClick={() => this.props.removeFromCart(this.props.item)}
                   className='btn-cart-modal btn-modal-decrease flex'>
@@ -185,7 +156,7 @@ export default class CartModalItem extends React.Component {
         <img src={this.props.item.gallery[0]} 
              alt={this.props.item.name}
              className='cart-modal-img' />
-      </div>
+        </div>
     )
   }
 }

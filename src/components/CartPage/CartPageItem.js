@@ -2,6 +2,7 @@ import React from 'react';
 import arrowLeft from '../../static/arrow-left.svg';
 import arrowRight from '../../static/arrow-right.svg';
 import { replaceSpaceWithDash } from '../../utils/StringUtils';
+import { convertArrayToObject } from '../../utils/DataUtils';
 
 export default class CartPageItem extends React.Component {
 
@@ -14,9 +15,20 @@ export default class CartPageItem extends React.Component {
     this.state = {
       imgIndex: 0
     }
+    this.cartPageItemContainsProductQuantity = 
+      this.cartPageItemContainsProductQuantity.bind(this);
+    this.cartPageItemClasslistContainsAttributeName = 
+      this.cartPageItemClasslistContainsAttributeName.bind(this);
   }
 
   componentDidMount() {
+    this.handleItemGallery();
+    if (this.props.item.selectedAttributes) {
+      this.setProductSelectedAttributes();
+    }
+  }
+
+  componentDidUpdate() {
     this.handleItemGallery();
     if (this.props.item.selectedAttributes) {
       this.setProductSelectedAttributes();
@@ -31,10 +43,10 @@ export default class CartPageItem extends React.Component {
     const selectedAttributes = this.props.item.selectedAttributes;
     const attributesContainers = this.getAttributesContainers(selectedAttributes);
 
-    for (let i = 0; i < attributesContainers.length; i++) {
+    for (let i = 0; i < Object.entries(selectedAttributes).length; i++) {
       this.setActiveAttribute(
-        Array.from(attributesContainers[i].children), 
-        selectedAttributes);
+        Array.from((Array.from(attributesContainers)[i]).children), 
+        convertArrayToObject(Object.entries(selectedAttributes)[i]));
     }
   }
 
@@ -43,33 +55,50 @@ export default class CartPageItem extends React.Component {
     Object.keys(selectedAttributes).forEach(
       attrName => {
         const containers = 
-        document.querySelectorAll(`.pdp-attr-buttons#${replaceSpaceWithDash(attrName)}`);
-        Array.from(containers).forEach(container => {
-          /**
-           * This check is needed to make sure that we don't select
-           * divs that don't contain our current props item.
-           * If omitted, all divs in cart modal with the specified
-           * selector are selected and the logic of highlighting the 
-           * attributes is breaking.
-           */
-            if (container.closest('.item-selection').innerText.includes(this.props.item.name)) {
-              attributesContainers.push(container);
-            }
-          }
-        )
-      }
-      );
+        document.querySelectorAll(`.${replaceSpaceWithDash(attrName)}`);
+
+        for (let i = 0; i < containers.length; i++) {
+          const closestButtons = 
+          containers[i].closest('.item-details') ? 
+          Array.from(containers[i].closest('.item-details').children).find(
+            item => item.classList.contains('item-buttons')) :
+            null;
+         /**
+         * This check is needed to make sure that we don't select
+         * divs that don't contain our current props item.
+         * If omitted, all divs in cart modal with the specified
+         * selector are selected and the logic of highlighting the 
+         * attributes is breaking.
+         */
+          if (this.props.cartProductIdContainsCurrentProductId(
+              containers[i], selectedAttributes) &&
+              this.cartPageItemClasslistContainsAttributeName(containers[i], attrName) &&
+              this.cartPageItemContainsProductQuantity(closestButtons)) {
+                attributesContainers.push(containers[i]);
+          } 
+        }
+      });
     return attributesContainers;
+  }
+
+  cartPageItemClasslistContainsAttributeName(container, attrName) {
+    return container.classList.contains(replaceSpaceWithDash(attrName));
+  }
+
+  cartPageItemContainsProductQuantity(closestButtons) {
+    return closestButtons ? Array.from(closestButtons.children).find(
+      child => child.classList.contains('cart-page-item-amount'))
+      .innerText.includes(this.props.item.amount) : false;
   }
 
   setActiveAttribute(buttons, selectedAttributes) {
     buttons.forEach(button => {
       button.classList.remove('selected');
-      if(selectedAttributes.hasOwnProperty(button.parentNode.id)){
-        if(button.innerText === selectedAttributes[button.parentNode.id] ||
-          button.id === selectedAttributes[button.parentNode.id]) {
-            button.classList.add('selected');
-        }
+
+      const attributeKeyName = Object.keys(selectedAttributes)[0];
+      if(button.innerText === selectedAttributes[attributeKeyName] ||
+        button.id === selectedAttributes[attributeKeyName]) {
+          button.classList.add('selected');
       }
     });
   }
@@ -143,7 +172,7 @@ export default class CartPageItem extends React.Component {
                     className='btn-cart-modal btn-modal-decrease flex'>
                     -
             </button>
-            <p>{this.props.item.amount}</p>
+            <p className='cart-page-item-amount'>{this.props.item.amount}</p>
             <button aria-label='Increase item quantity'
                     onClick={(e) => this.props.addToCart(e, this.props.item)}
                     className='btn-cart-modal btn-modal-increase flex'>
@@ -158,90 +187,29 @@ export default class CartPageItem extends React.Component {
             {this.props.item.attributes.length > 0 && 
               this.props.item.attributes.map(attribute => {
                 if (attribute.name === 'Color') {
-                return (<div className='pdp-attributes pdp-colors-container'>
-                <div className='color-swatches pdp-attr-buttons flex'
-                    id={attribute.name}>
-                  {
-                    attribute.items.map(color => 
-                    <button aria-label={color.displayValue}
-                            style={{backgroundColor: `${color.value}`}}
-                            className='pdp-button pdp-color-swatch btn-cart-page'
-                            id={color.id}
-                            onClick={(e) => 
-                            this.props.selectProductAttributes(
-                              e, 
-                              attribute.name, 
-                              this.props.item)}>
-                    </button>)
-                  }
-                </div>
-              </div>)
-              } else if (attribute.name === 'Capacity') {
                 return (
-                  <div className='pdp-attributes pdp-capacity-container'>
-                    <div className='capacity pdp-attr-buttons flex'
-                        id={attribute.name}>
-                    {attribute.items.map(capacity => 
-                    <button className='pdp-button pdp-capacity btn-cart-page'
-                            onClick={(e) => 
-                            this.props.selectProductAttributes(
-                              e, 
-                              attribute.name,
-                              this.props.item)}>
-                        {capacity.value}
-                    </button>
-                    )}
-                    </div>
+                <div className='pdp-attributes pdp-colors-container'>
+                  <div className={`${this.props.item.id} ${replaceSpaceWithDash(attribute.name)} color-swatches pdp-attr-buttons flex`}
+                      id={this.props.item.id}>
+                    {
+                      attribute.items.map(color => 
+                      <button aria-label={color.displayValue}
+                              style={{backgroundColor: `${color.value}`}}
+                              className='pdp-button pdp-color-swatch btn-cart-page'
+                              id={color.id}>
+                      </button>)
+                    }
                   </div>
-                )
-              } else if (attribute.name === 'Size') {
+              </div>)
+              } else {
                 return (
-                  <div className='pdp-attributes pdp-sizes-container'>
-                    <div className='sizes pdp-attr-buttons flex'
-                        id={attribute.name}>
-                    {attribute.items.map(size => 
-                    <button className='pdp-button pdp-size btn-cart-page'
-                            onClick={(e) => 
-                            this.props.selectProductAttributes(
-                              e, 
-                              attribute.name,
-                              this.props.item)}>
-                        {size.value}
-                    </button>)}
-                    </div>
-                  </div>            
-                )
-              } else if (attribute.name === 'With USB 3 ports') {
-                  return (
-                    <div className='pdp-attributes pdp-ports-container'>
-                    <div className='ports pdp-attr-buttons flex'
-                        id={replaceSpaceWithDash(attribute.name)}>
-                    {attribute.items.map(item => 
-                    <button className='pdp-button pdp-port btn-cart-page'
-                            onClick={(e) => 
-                            this.props.selectProductAttributes(
-                              e, 
-                              replaceSpaceWithDash(attribute.name),
-                              this.props.item)}>
-                        {item.value}
-                    </button>)}
-                    </div>
-                  </div> 
-                  )
-              } else if (attribute.name === 'Touch ID in keyboard') {
-                return (
-                    <div className='pdp-attributes pdp-touchid-container'>
-                    <div className='touchid pdp-attr-buttons flex'
-                        id={replaceSpaceWithDash(attribute.name)}>
-                    {attribute.items.map(item => 
-                    <button className='pdp-button pdp-touchid btn-cart-page'
-                            onClick={(e) => 
-                            this.props.selectProductAttributes(
-                              e, 
-                              replaceSpaceWithDash(attribute.name),
-                              this.props.item)}>
-                        {item.value}
-                    </button>)}
+                    <div className='pdp-attributes pdp-container'>
+                    <div className={`${this.props.item.id} ${replaceSpaceWithDash(attribute.name)} pdp-attr-buttons flex`}
+                        id={this.props.item.id}>
+                          {attribute.items.map(item => 
+                          <button className='pdp-button btn-cart-page'>
+                              {item.value}
+                          </button>)}
                     </div>
                   </div> 
                 )

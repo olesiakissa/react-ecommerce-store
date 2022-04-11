@@ -7,6 +7,7 @@ import Header from './Header';
 import ProductsList from './PDP/ProductsList';
 import ProductDescriptionPage from './PDP/ProductDescriptionPage';
 import CartPage from './CartPage/CartPage';
+import { convertArrayToStringEntry } from '../utils/DataUtils.js';
 
 export default class App extends React.Component {
 
@@ -27,13 +28,15 @@ export default class App extends React.Component {
     this.updateLocalStorageProductDetails = this.updateLocalStorageProductDetails.bind(this);
     this.updateProductDetailsOnReload = this.updateProductDetailsOnReload.bind(this);
     this.updateSelectedAttributesPDP = this.updateSelectedAttributesPDP.bind(this);
-    this.updateSelectedAttributesCartItem = this.updateSelectedAttributesCartItem.bind(this);
     this.addToCartWithSelectedAttributes = this.addToCartWithSelectedAttributes.bind(this);
     this.addToCartWithDefaultAttributes = this.addToCartWithDefaultAttributes.bind(this);
     this.addToCartWithoutAttributes = this.addToCartWithoutAttributes.bind(this);
     this.getProductDefaultAttributes = this.getProductDefaultAttributes.bind(this);
     this.increaseCartItemAmount = this.increaseCartItemAmount.bind(this);
     this.addNewCartItem = this.addNewCartItem.bind(this);
+    this.createCustomProductId = this.createCustomProductId.bind(this);
+    this.calculateTotalCartItemsQuantity = this.calculateTotalCartItemsQuantity.bind(this);
+    this.cartProductIdContainsCurrentProductId = this.cartProductIdContainsCurrentProductId.bind(this);
   }
 
   state = {
@@ -47,7 +50,7 @@ export default class App extends React.Component {
     cartItems: [],
     cartModalIsShown: false
   }
-
+// TODO Add specific endpoints for each request
   componentDidMount() {
     client.query(GET_ALL_DATA)
       .then(result => {
@@ -157,12 +160,44 @@ export default class App extends React.Component {
     localStorage.setItem("productDetails", JSON.stringify(this.state.productDetails));
   }
 
+  calculateTotalCartItemsQuantity() {    
+    return this.state.cartItems.map(
+      item => item.amount).reduce(
+        (prevAmount, nextAmount) => prevAmount + nextAmount);
+  }
+
+  createCustomProductId(product) {
+    return product.selectedAttributes ? 
+    `${product.id}${Object.entries(product.selectedAttributes)
+        .join('')}`.replaceAll(/[ ,]/g, '') :
+    `${product.id}${Object.entries(this.getProductDefaultAttributes(product))
+        .join('')}`.replaceAll(/[ ,]/g, '');
+  }
+
+  cartProductIdContainsCurrentProductId(product, attributes) {
+    const containsValuesFlagsArray = [];
+
+    Object.entries(attributes).forEach(entry => {
+      containsValuesFlagsArray.push((
+        product.id.includes(convertArrayToStringEntry(entry)) ? true : false
+      ));
+    });
+
+    return containsValuesFlagsArray.every(flag => flag === true);
+  }
+
   handleAddToCart(e, product) {
     e.preventDefault();
-    const isProductInCart = this.state.cartItems.find(
-                            item => item.id === product.id);
+    let isProductInCart = {};
+       
     if (product.hasOwnProperty("attributes")) {
-      if (product.hasOwnProperty("selectedAttributes")) {
+      const productAttributes = 
+      product.selectedAttributes ?? this.getProductDefaultAttributes(product);
+      isProductInCart = this.state.cartItems.find(
+          item => this.cartProductIdContainsCurrentProductId(
+            item, productAttributes) === true && 
+            item.name === product.name);
+      if (product.hasOwnProperty("selectedAttributes")) {      
         this.addToCartWithSelectedAttributes(isProductInCart, product);
       } else {
         this.addToCartWithDefaultAttributes(isProductInCart, product);
@@ -170,6 +205,13 @@ export default class App extends React.Component {
     } else {
       this.addToCartWithoutAttributes(isProductInCart, product);
     }
+  }
+
+  getProductDefaultAttributes(product) {
+    const selectedAttributesArray = product.attributes.map(attribute => ({
+                                      [attribute.name]: attribute.items[0].id
+                                    }))
+    return Object.assign({}, ...selectedAttributesArray);
   }
 
   increaseCartItemAmount(product) {
@@ -186,12 +228,33 @@ export default class App extends React.Component {
   }
 
   addNewCartItem(product) {
-    this.setState({
-      cartItems: [...this.state.cartItems, {...product, amount: 1}]
-    }, () => {
-      this.updateTotalPrice();
-      this.updateLocalStorageCartItems();
-      })
+    if (product.hasOwnProperty('attributes') && !product.selectedAttributes) {
+      this.setState({
+        cartItems: [...this.state.cartItems, 
+          {
+            ...product, 
+            id: this.createCustomProductId(product),
+            selectedAttributes: this.getProductDefaultAttributes(product),
+            amount: 1
+          }]
+      }, () => {
+        this.updateTotalPrice();
+        this.updateLocalStorageCartItems();
+        });
+    } else {
+      this.setState({
+        cartItems: [...this.state.cartItems, 
+          {
+            ...product, 
+            id: this.createCustomProductId(product),
+            amount: 1
+          }]
+      }, () => {
+        this.updateTotalPrice();
+        this.updateLocalStorageCartItems();
+        });      
+    }
+
   }
 
   addToCartWithoutAttributes(isProductInCart, product) {
@@ -204,44 +267,17 @@ export default class App extends React.Component {
 
   addToCartWithSelectedAttributes(isProductInCart, product) {
     if (isProductInCart) {
-      this.increaseCartItemAmount(product);
+      this.increaseCartItemAmount(isProductInCart);
     } else {
       this.addNewCartItem(product);
-    }
-  }
-
-  getProductDefaultAttributes(product) {
-    const selectedAttributesArray = product.attributes.map(attribute => ({
-                                      [attribute.name]: attribute.items[0].id
-                                    }))
-    return Object.assign({}, ...selectedAttributesArray);
+    } 
   }
 
   addToCartWithDefaultAttributes(isProductInCart, product) {
     if (isProductInCart) {
-      this.setState({
-        cartItems: this.state.cartItems.map(item => item.id === product.id ? 
-          {
-            ...item,
-            amount: item.amount + 1,
-            selectedAttributes: this.getProductDefaultAttributes(product)
-          } : item)
-      }, () => {
-        this.updateTotalPrice();
-        this.updateLocalStorageCartItems()
-      });
+      this.increaseCartItemAmount(isProductInCart);
     } else {
-      this.setState({
-        cartItems: [...this.state.cartItems, 
-                    {...product, 
-                      amount: 1,
-                      selectedAttributes: this.getProductDefaultAttributes(product)
-                    }]
-      }, () => {
-        this.updateTotalPrice();
-        this.updateLocalStorageCartItems();
-        }
-      );  
+      this.addNewCartItem(product);  
     }
   }
 
@@ -295,18 +331,7 @@ export default class App extends React.Component {
         attrValue = e.target.innerHTML;
         break;
     }
-    /**
-     * If the target button exists in the context of PDP
-     * then we have to update the attributes of the product
-     * that is being added to the cart, otherwise
-     * we have to update the state of product in the cart
-     */
-    if (e.target.classList.contains('btn-cart-modal') ||
-        e.target.classList.contains('btn-cart-page')) {
-      this.updateSelectedAttributesCartItem(attrName, attrValue, product);
-     } else {
       this.updateSelectedAttributesPDP(attrName, attrValue, product);
-    }
   }
 
   updateSelectedAttributesPDP(attrName, attrValue, product) {
@@ -330,19 +355,6 @@ export default class App extends React.Component {
         }
       }, this.updateLocalStorageProductDetails)
     }
-  }
-
-  updateSelectedAttributesCartItem(attrName, attrValue, product) {
-      this.setState({
-        cartItems: this.state.cartItems.map(item => item.id === product.id ?
-          {
-            ...product,
-            selectedAttributes: {
-              ...item.selectedAttributes,
-              [attrName]: attrValue
-            }
-          } : item)
-      }, this.updateLocalStorageCartItems)
   }
 
   /**
@@ -386,6 +398,7 @@ export default class App extends React.Component {
 
   render() {
     const header = document.querySelector('.header')
+    // TODO Remove inline styles
     const styles = {
       headerOffsetHeight: header ? header.offsetHeight : 100,
       cartModalOffsetRight: header ? window.getComputedStyle(header).paddingInlineEnd : 50
@@ -404,11 +417,13 @@ export default class App extends React.Component {
                 toggleCartModal={this.toggleCartModal}
                 addToCart={this.handleAddToCart}
                 removeFromCart={this.handleRemoveFromCart}
-                selectProductAttributes={this.selectProductAttributes}
                 totalPrice={this.state.totalPrice}
+                calculateTotalCartItemsQuantity={this.calculateTotalCartItemsQuantity}
+                cartProductIdContainsCurrentProductId={this.cartProductIdContainsCurrentProductId}
                 styles={styles}
          />}
          <main className='main'>
+         {/* TODO Remove inline styles */}
          <div className='content-overlay' 
               style={{display: this.state.cartModalIsShown ? 'block' : 'none',
               top: `${styles.headerOffsetHeight}px`}}>
@@ -434,7 +449,7 @@ export default class App extends React.Component {
                                                   totalPrice={this.state.totalPrice}
                                                   updateTotalPrice={this.updateTotalPrice}
                                                   currentCurrency={this.state.currentCurrency}
-                                                  selectProductAttributes={this.selectProductAttributes}
+                                                  cartProductIdContainsCurrentProductId={this.cartProductIdContainsCurrentProductId}
                                                   addToCart={this.handleAddToCart}
                                                   removeFromCart={this.handleRemoveFromCart}
             />}/>
