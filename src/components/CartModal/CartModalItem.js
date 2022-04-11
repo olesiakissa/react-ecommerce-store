@@ -67,7 +67,6 @@ export default class CartModalItem extends React.Component {
                   attributesContainers.push(containers[i]);
             } 
           }
-
         });
     return attributesContainers;
   }
@@ -77,7 +76,7 @@ export default class CartModalItem extends React.Component {
   }
 
   cartModalItemContainsProductQuantity(closestModalButtons) {
-    return closestModalButtons? Array.from(closestModalButtons.children).find(
+    return closestModalButtons ? Array.from(closestModalButtons.children).find(
              child => child.classList.contains('cart-modal-item-amount'))
              .innerText.includes(this.props.item.amount) : false;
   }

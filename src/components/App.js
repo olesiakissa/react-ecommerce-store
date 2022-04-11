@@ -449,7 +449,7 @@ export default class App extends React.Component {
                                                   totalPrice={this.state.totalPrice}
                                                   updateTotalPrice={this.updateTotalPrice}
                                                   currentCurrency={this.state.currentCurrency}
-                                                  selectProductAttributes={this.selectProductAttributes}
+                                                  cartProductIdContainsCurrentProductId={this.cartProductIdContainsCurrentProductId}
                                                   addToCart={this.handleAddToCart}
                                                   removeFromCart={this.handleRemoveFromCart}
             />}/>

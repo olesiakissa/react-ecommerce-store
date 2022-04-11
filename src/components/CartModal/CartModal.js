@@ -22,7 +22,10 @@ export default class CartModal extends React.Component {
    * Closes cart modal if the user clicks outside of the window.
    */
   handleOutsideClick(e) {
-    if (this.refModal.current.contains(e.target)) {
+    // Make sure that the reference to the modal still
+    // exists as the changes in the environment are asynchronous
+    if (this.refModal.current && 
+        this.refModal.current.contains(e.target)) {
       return;
     } else {
       this.props.toggleCartModal();
